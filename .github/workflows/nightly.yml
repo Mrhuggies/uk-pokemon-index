@@ -1,0 +1,33 @@
+name: Nightly prices
+on:
+  schedule:
+    - cron: '20 4 * * *'   # 04:20 UTC, after Cardmarket's daily price refresh
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['watch/**', 'lib/**', 'scripts/**']
+permissions:
+  contents: write
+concurrency:
+  group: prices
+  cancel-in-progress: false
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Fetch prices and update index
+        run: node scripts/update.mjs
+      - name: Commit data
+        run: |
+          git config user.name "price-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/data
+          if git diff --cached --quiet; then echo "No changes"; exit 0; fi
+          git commit -m "Prices for $(TZ=Europe/London date +%F)"
+          git pull --rebase origin main
+          git push

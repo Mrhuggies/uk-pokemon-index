@@ -1,0 +1,6 @@
+{
+  "name": "uk-pokemon-index",
+  "private": true,
+  "type": "module",
+  "scripts": { "update": "node scripts/update.mjs", "test": "node test/core.test.mjs" }
+}
