@@ -29,7 +29,7 @@ async function readWatch() {
     let meta = {};
     try { const t = (await fs.readFile(path.join(WATCH, f), 'utf8')).trim(); meta = t ? JSON.parse(t) : {}; } catch (e) { console.warn(`watch/${f}: bad JSON, using defaults`); }
     const n = (v) => (v === '' || v == null || isNaN(+v) ? null : +v);
-    cards.push({ id, qty: n(meta.qty), cost: n(meta.cost), variant: meta.variant === 'holo' ? 'holo' : 'normal' });
+    cards.push({ id, qty: n(meta.qty), cost: n(meta.cost), variant: meta.variant === 'holo' ? 'holo' : 'normal', edition: meta.edition === '1st' ? '1st' : null, note: typeof meta.note === 'string' ? meta.note.slice(0, 120) : null });
   }
   return { cards };
 }

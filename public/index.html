@@ -111,6 +111,11 @@ button{cursor:pointer}
 .btn.pri{background:var(--red);border-color:var(--red);color:#fff}
 .total{display:flex;gap:18px;flex-wrap:wrap;margin:6px 0 10px;font-size:15px;color:var(--mute)}
 .total b{color:var(--ink);font-family:Archivo,sans-serif;font-stretch:85%;font-size:22px;margin-left:4px}
+.head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.sortl{font-size:14px;color:var(--mute);display:flex;align-items:center;gap:8px}
+.sortl select{min-height:40px;padding:4px 10px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.more{width:100%;margin-top:10px}
+.src{font-size:12px;color:var(--mute);border:1px solid var(--line);border-radius:4px;padding:0 4px;margin-left:4px;white-space:nowrap}
 .search{position:relative;display:flex;gap:8px;margin:10px 0}
 .search input{flex:1;min-height:48px;padding:8px 14px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
 .sugg{position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--bg);border:1px solid var(--line);border-radius:12px;box-shadow:0 14px 32px rgba(0,0,0,.18);list-style:none;margin:0;padding:6px;z-index:5;max-height:360px;overflow-y:auto}
@@ -180,7 +185,7 @@ details summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;alig
 <section class="band" style="padding-top:0">
   <div class="wrap cols">
     <div>
-      <h2>My cards</h2>
+      <div class="head"><h2>My cards</h2><label class="sortl">Sort <select id="wsort"><option value="value">Value</option><option value="set">Set</option><option value="mom">7d/30d move</option><option value="name">Name</option></select></label></div>
       <div class="total" id="totals"></div>
       <div id="pfchart"></div>
       <div id="watch"></div>
@@ -429,20 +434,25 @@ function cardRow(r, extra = '', right = null) {
 }
 function dayChange(id) { const s = D.history?.cards?.[id]; if (!s || s.length < 2) return null; const a = s[s.length - 2], b = s[s.length - 1]; return a && b ? (b / a - 1) * 100 : null; }
 
+let showAll = false, wsort = ls.get('wsort') || 'value';
 function renderWatch() {
   const w = D.watchlist.cards, h = D.history;
-  let val = 0, cost = 0, hasCost = false;
-  const rows = w.map((e) => {
-    const r = recs[e.id] || { id: e.id, name: e.id, set: 'Price arrives after the next update', gbp: null };
-    const qty = e.qty || 1;
-    if (r.gbp) val += r.gbp * qty;
-    if (e.cost != null) { cost += e.cost * qty; hasCost = true; }
-    const dc = dayChange(e.id);
-    const bits = [qty > 1 ? qty + ' ×' : '', e.cost != null ? 'paid ' + money(e.cost) : '', dc != null ? `<span class="${cls(dc)}">${pct(dc)} today</span>` : ''].filter(Boolean);
-    return cardRow(r, bits.length ? `<br><span class="s">${bits.join(' · ')}</span>` : '');
+  let val = 0, cost = 0, hasCost = false, n = 0;
+  const items = w.map((e) => ({ e, r: recs[e.id] || { id: e.id, name: e.id, set: 'Price arrives after the next update', gbp: null } }));
+  for (const { e, r } of items) { const q = e.qty || 1; n += q; if (r.gbp) val += r.gbp * q; if (e.cost != null) { cost += e.cost * q; hasCost = true; } }
+  const key = { value: (a, b) => (b.r.gbp || 0) * (b.e.qty || 1) - (a.r.gbp || 0) * (a.e.qty || 1), set: (a, b) => (a.r.setDate || '').localeCompare(b.r.setDate || '') || (a.r.set || '').localeCompare(b.r.set || '') || (parseInt(a.r.number) || 0) - (parseInt(b.r.number) || 0), mom: (a, b) => (mom(b.r) ?? -999) - (mom(a.r) ?? -999), name: (a, b) => a.r.name.localeCompare(b.r.name) }[wsort];
+  items.sort(key);
+  const shown = showAll ? items : items.slice(0, 12);
+  const rows = shown.map(({ e, r }) => {
+    const qty = e.qty || 1, dc = dayChange(e.id);
+    const srcTag = r.source && r.source.startsWith('tcgplayer') ? `<span class="src">${r.source === 'tcgplayer-1st' ? 'US 1st Ed price' : 'US price'}</span>` : '';
+    const bits = [qty > 1 ? qty + ' ×' : '', e.cost != null ? 'paid ' + money(e.cost) : '', dc != null ? `<span class="${cls(dc)}">${pct(dc)} today</span>` : '', e.note ? esc(e.note) : ''].filter(Boolean);
+    return cardRow(r, (srcTag ? ' ' + srcTag : '') + (bits.length ? `<br><span class="s">${bits.join(' · ')}</span>` : ''));
   });
-  $('#watch').innerHTML = rows.length ? rows.join('') : '<p class="empty">No cards yet. Find a card, open it and tap Add card. It opens GitHub with the file ready; commit it and the card is priced at the next run (about ten minutes), then every night.</p>';
-  $('#totals').innerHTML = w.length ? `<span>Value<b>${money(val)}</b></span>${hasCost ? `<span>Paid<b>${money(cost)}</b></span><span>Gain<b class="${cls(val - cost)}">${money(val - cost)}</b></span>` : ''}` : '';
+  $('#watch').innerHTML = rows.length ? rows.join('') + (items.length > 12 ? `<button type="button" class="btn more" id="wmore">${showAll ? 'Show fewer' : `Show all ${items.length} cards`}</button>` : '') : '<p class="empty">No cards yet. Find a card, open it and tap Add card. It opens GitHub with the file ready; commit it and the card is priced at the next run (about five minutes), then every night.</p>';
+  const mb = $('#wmore'); if (mb) mb.onclick = () => { showAll = !showAll; renderWatch(); };
+  $('#wsort').value = wsort;
+  $('#totals').innerHTML = w.length ? `<span>Cards<b>${N0.format(n)}</b></span><span>Value<b>${money(val)}</b></span>${hasCost ? `<span>Paid<b>${money(cost)}</b></span><span>Gain<b class="${cls(val - cost)}">${money(val - cost)}</b></span>` : ''}` : '';
   const pts = (h?.dates || []).map((d, i) => { let t = 0, any = false; for (const e of w) { const v = h.cards[e.id]?.[i]; if (v != null) { t += v * (e.qty || 1); any = true; } } return [d, any ? Math.round(t * 100) / 100 : null]; }).filter((p) => p[1] != null);
   if (pts.length && D.latest) { // back-estimate from each card's Cardmarket averages
     const est = [[-15, 'avg30'], [-3.5, 'avg7'], [-1, 'avg1']].map(([off, k]) => { let t = 0, ok = true; for (const e of w) { const r = recs[e.id]; if (!r?.[k]) { ok = false; break; } t += r[k] * (e.qty || 1); } return ok ? [addDays(D.latest.date, off), Math.round(t * 100) / 100, true] : null; }).filter((p) => p && p[0] < tms(pts[0][0]));
@@ -477,11 +487,11 @@ function openCard(id) {
   const w = D.watchlist.cards.find((c) => c.id === id);
   const q = encodeURIComponent(`${r.name} ${r.set || ''} ${r.number || ''}`.trim());
   const pts = cardSeries(r); const nReal = pts.filter((p) => !p[2]).length;
-  const lad = [['30-day avg', r.avg30], ['7-day avg', r.avg7], ['Yesterday', r.avg1], ['Trend', r.trend], ['Our price', r.gbp]].filter((x) => x[1] != null);
+  const lad = [['30-day avg', r.avg30], ['7-day avg', r.avg7], ['Yesterday', r.avg1], ['Trend', r.trend], ['Our price', r.gbp], ['US unlimited', r.source === 'tcgplayer' ? null : r.usGbp], ['US 1st Ed', r.source === 'tcgplayer-1st' ? null : r.us1stGbp]].filter((x) => x[1] != null);
   const mx = Math.max(...lad.map((x) => x[1]), 1), mn = Math.min(...lad.map((x) => x[1])) * 0.8;
   $('#panel').innerHTML = `<div class="dhead"><button type="button" class="btn" id="close">Close</button></div>
-    <div class="ph2"><span class="holo">${r.img ? `<img src="${esc(r.img.replace('/low.webp', '/high.webp'))}" alt="${esc(r.name)}">` : ''}</span><div><h2>${esc(r.name)}</h2><p class="sub">${esc(r.set || '')}${r.number ? ' · ' + esc(r.number) : ''}${r.rarity ? ' · ' + esc(r.rarity) : ''}</p><div class="big num" style="font-size:52px">${money(r.gbp)}</div><p class="notes">Median of Cardmarket's trend, 7-day and 30-day prices${r.eur ? ` (€${Number(r.eur).toFixed(2)})` : ''}.</p></div></div>
-    <h3 style="margin-top:18px">Price ladder</h3><div class="ladder">${lad.map(([k, v]) => `<div class="hbar"><span>${k}</span><span class="tr"><i style="width:${Math.max(4, (v - mn) / (mx - mn) * 100)}%;background:${k === 'Our price' ? 'var(--red)' : 'var(--c-blue)'}"></i></span><span class="v">${money(v)}</span></div>`).join('')}</div>
+    <div class="ph2"><span class="holo">${r.img ? `<img src="${esc(r.img.replace('/low.webp', '/high.webp'))}" alt="${esc(r.name)}">` : ''}</span><div><h2>${esc(r.name)}</h2><p class="sub">${esc(r.set || '')}${r.number ? ' · ' + esc(r.number) : ''}${r.rarity ? ' · ' + esc(r.rarity) : ''}</p><div class="big num" style="font-size:52px">${money(r.gbp)}</div><p class="notes">${r.source === 'tcgplayer' ? 'Cardmarket has no price for this card, so this is the TCGplayer (US) market price in pounds.' : r.source === 'tcgplayer-1st' ? 'TCGplayer (US) 1st Edition market price, in pounds.' : `Median of Cardmarket's trend, 7-day and 30-day prices${r.eur ? ` (€${Number(r.eur).toFixed(2)})` : ''}.`}</p></div></div>
+    <h3 style="margin-top:18px">Price ladder</h3><div class="ladder">${lad.map(([k, v]) => `<div class="hbar"><span>${k}</span><span class="tr"><i style="width:${Math.max(4, (v - mn) / (mx - mn) * 100)}%;background:${k === 'Our price' ? 'var(--red)' : k.startsWith('US') ? 'var(--c-vintage)' : 'var(--c-blue)'}"></i></span><span class="v">${money(v)}</span></div>`).join('')}</div>
     ${pts.length >= 2 ? `<h3 style="margin-top:16px">Price over time</h3><div class="fig s light" id="cfig"></div><p class="cardnote">${pts.some((p) => p[2]) ? `Dashed: Cardmarket's 30-day, 7-day and yesterday averages. Solid: ${nReal > 1 ? 'nightly prices' : 'today'}.` : 'Nightly prices.'}${!D.history?.cards?.[id] ? ' Add it to your cards to build a nightly line.' : ''}</p>` : ''}
     <div class="links"><a href="https://www.ebay.co.uk/sch/i.html?_nkw=${q}&LH_Sold=1&LH_Complete=1" target="_blank" rel="noopener">eBay UK sold</a><a href="https://www.cardmarket.com/en/Pokemon/Products/Search?searchString=${encodeURIComponent(r.name)}" target="_blank" rel="noopener">Cardmarket</a></div>
     <h3>${w ? 'In my cards' : 'Add to my cards'}</h3>
@@ -525,7 +535,10 @@ function priceOf(c, fx) {
   const xs = [g('trend'), g('avg7'), g('avg30')].filter(Boolean).sort((a, b) => a - b);
   const eur = xs.length === 3 ? xs[1] : xs.length === 2 ? (xs[0] + xs[1]) / 2 : xs[0] ?? g('avg');
   const r2 = (v) => v > 0 ? Math.round(v * fx * 100) / 100 : null;
-  return { id: c.id, name: c.name, set: c.set?.name || '', number: c.localId, rarity: c.rarity || '', img: c.image ? c.image + '/low.webp' : null, eur, gbp: r2(eur), trend: r2(g('trend')), avg1: r2(g('avg1')), avg7: r2(g('avg7')), avg30: r2(g('avg30')), low: r2(g('low')) };
+  const usd = D?.latest?.fx?.usd; const tp = c.pricing?.tcgplayer || {};
+  const us = (keys) => { for (const k of keys) { const m = tp[k]?.marketPrice || tp[k]?.midPrice; if (m > 0 && usd) return Math.round(m * usd * 100) / 100; } return null; };
+  const usUnl = us(['unlimited-holofoil', 'unlimited', 'holofoil', 'normal', 'unlimited-normal', 'reverse-holofoil']), us1st = us(['1st-edition-holofoil', '1st-edition', '1st-edition-normal']);
+  return { id: c.id, name: c.name, set: c.set?.name || '', number: c.localId, rarity: c.rarity || '', img: c.image ? c.image + '/low.webp' : null, eur, gbp: r2(eur) ?? usUnl, source: eur ? 'cardmarket' : usUnl ? 'tcgplayer' : null, usGbp: usUnl, us1stGbp: us1st, trend: r2(g('trend')), avg1: r2(g('avg1')), avg7: r2(g('avg7')), avg30: r2(g('avg30')), low: r2(g('low')) };
 }
 let searchId = 0;
 async function search(q, exact) {
@@ -588,6 +601,7 @@ $('#q').addEventListener('keydown', (e) => {
 });
 $('#sform').onsubmit = (e) => { e.preventDefault(); const q = $('#q').value.trim(); $('#sugg').hidden = true; if (q.length > 1) search(q, false); };
 addEventListener('resize', () => { if (D?.latest) renderFan(); });
+$('#wsort').onchange = (e) => { wsort = e.target.value; ls.set('wsort', wsort); renderWatch(); };
 load();
 }
 </script>
