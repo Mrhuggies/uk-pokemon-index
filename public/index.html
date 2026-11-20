@@ -156,7 +156,7 @@ details summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;alig
     <div class="method">
       <h2 style="margin-top:28px">How the index works</h2>
       <p>Prices come from Cardmarket, Europe's main card marketplace, through the free TCGdex API. Each night the tracker takes the median of every card's Cardmarket trend price, 7-day average and 30-day average (the median stops one jumpy figure moving a card, which matters for vintage cards where listings mix conditions), converts it to pounds at the day's ECB euro reference rate, and stores it.</p>
-      <p>The index is chain-linked and equal-weighted: each day it moves by the geometric mean of every card's price change since the day before, so a £20 card counts as much as a £2,000 one. Each card's single-day move is capped at roughly +49% or −33% to stop thin listings swinging the index. It started at 1,000 on its first day, and the sub-indices split cards into Vintage (1999 to 2009), Modern (2010 to 2022) and Scarlet &amp; Violet (2023 on).</p>
+      <p>The index is chain-linked and equal-weighted: each day it moves by the geometric mean of every card's price change since the day before, so a £20 card counts as much as a £2,000 one. Each card's single-day move is capped at roughly +49% or −33% to stop thin listings swinging the index. It started at 1,000 on its first day, and the sub-indices split cards into Vintage (1999 to 2009), Modern (2010 to 2022) and Current era (2023 on: Scarlet &amp; Violet and Mega Evolution).</p>
       <p>Until there's enough nightly history, the board shows momentum: each group's 7-day average sale price against its 30-day average. Prices are for raw, ungraded cards and include the currency effect, so a weaker pound pushes the index up. For a UK sold-price check on any card, use its eBay UK link.</p>
       <p class="notes" id="notes"></p>
     </div>
@@ -177,7 +177,7 @@ const pct = (v, dp = 1) => v == null || !isFinite(v) ? '—' : (v > 0 ? '+' : v 
 const cls = (v) => v == null ? '' : v > 0 ? 'up' : v < 0 ? 'down' : '';
 const dfmt = (d) => new Date(d + 'T12:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' });
 const REPO = 'Mrhuggies/uk-pokemon-index';
-const SEGS = [['all', 'All cards'], ['vintage', 'Vintage'], ['modern', 'Modern'], ['current', 'Scarlet & Violet']];
+const SEGS = [['all', 'All cards'], ['vintage', 'Vintage'], ['modern', 'Modern'], ['current', 'Current era']];
 const RANGES = [['1M', 31], ['3M', 92], ['1Y', 366], ['All', 1e9]];
 let D = null, seg = 'all', range = 'All', recs = {}, lastResults = [];
 const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
