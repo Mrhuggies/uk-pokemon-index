@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>UK Pokémon Card Index</title>
-<meta name="theme-color" content="#0f380f">
+<meta name="theme-color" content="#1c3a24">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=Inter:wght@400;500;600&family=Pixelify+Sans:wght@600&display=swap" rel="stylesheet">
 <style>
@@ -31,31 +31,39 @@ button{cursor:pointer}
 .sub{color:var(--mute);margin:0 0 16px;max-width:68ch}
 .up{color:var(--up)}.down{color:var(--down)}
 /* board */
-.board{--g0:#cadc9f;--g1:#8bac0f;--g2:#306230;--g3:#0f380f;background:var(--g3);color:var(--g0);position:relative;overflow:hidden}
+.board{--ink-d:#1f2a1c;--navy:#39486a;--deep:#1c3a24;--cream:#eef6e0;--soft:#b5cba6;background:var(--deep);color:var(--cream);position:relative;overflow:hidden}
 #world{position:absolute;left:0;top:0;image-rendering:pixelated;image-rendering:crisp-edges;pointer-events:none}
 .board .wrap{position:relative}
 .board .up{color:#b8f27a}.board .down{color:#ffb39e}
-.board h1{font-family:'Pixelify Sans',Archivo,sans-serif;font-stretch:normal;font-weight:600;color:var(--g3);letter-spacing:.01em}
-.board .hero,.board .top{color:var(--g3)}
-.board .meta,.board .seglabel,.board .stat,.board .fancap{color:var(--g3)}
-.board .seglabel .dot{box-shadow:0 0 0 2px var(--g3)}
-.board .chip{background:var(--g3);color:var(--g0)}
-.lane{position:relative;margin-top:14px}
+.dlg{background:#fbfaf2;color:var(--ink-d);border:3px solid var(--navy);border-radius:10px;box-shadow:inset 0 0 0 2px #fbfaf2,inset 0 0 0 4px #b6c2dc,4px 5px 0 rgba(20,30,15,.35);padding:14px 18px}
+.board .top{align-items:center}
+.board .top .dlg{display:flex;flex-wrap:wrap;gap:4px 18px;align-items:baseline;padding:10px 16px}
+.board h1{font-family:'Pixelify Sans',Archivo,sans-serif;font-stretch:normal;font-weight:600;color:var(--ink-d);letter-spacing:.01em;font-size:clamp(22px,3.4vw,30px)}
+.board .meta{color:#4a5560}
+.board .hero{align-items:start}
+.board .hero>.dlg{justify-self:start;max-width:520px}
+.board .seglabel,.board .stat{color:#4a5560}
+.board .big{color:var(--ink-d)}
+.board .seglabel .dot{box-shadow:0 0 0 2px #fbfaf2,0 0 0 3px var(--navy)}
+.board .chip{background:var(--navy);color:#fff}
+.board .fancap{display:inline-block;padding:6px 12px;margin-top:30px;font-size:13px;color:var(--ink-d);background:#fbfaf2;border:2px solid var(--navy);border-radius:8px}
+.fanwrap{text-align:center}
+.lane{position:relative}
 .top{display:flex;flex-wrap:wrap;gap:8px 20px;align-items:baseline;justify-content:space-between}
 .meta{font-size:14px;color:#ffe0d9}
-.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,420px);gap:20px 36px;margin-top:18px;align-items:center}
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,420px);gap:20px 36px;margin-top:16px;align-items:center}
 .seglabel{font-size:15px;color:#ffe0d9;margin-bottom:4px;display:flex;align-items:center;gap:8px}
 .dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex:none;box-shadow:0 0 0 2px rgba(255,255,255,.6)}
-.big{font-size:clamp(60px,8vw,100px);line-height:.9;font-weight:800;white-space:nowrap}
+.big{font-size:clamp(56px,7vw,88px);line-height:.9;font-weight:800;white-space:nowrap}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
 .chip{background:rgba(0,0,0,.22);border-radius:8px;padding:6px 10px;font-size:14px;white-space:nowrap}
 .chip b{font-family:Archivo,sans-serif;font-stretch:85%;font-size:17px;margin-left:4px}
 .stat{margin-top:12px;font-size:14px;color:#ffe0d9}
 /* card fan */
 .fan{position:relative;height:250px}
-.fan button{position:absolute;bottom:0;left:50%;width:clamp(84px,11vw,132px);aspect-ratio:63/88;border:0;padding:0;background:#30623055;border-radius:6px;transform-origin:50% 120%;box-shadow:4px 6px 0 rgba(15,56,15,.45);transition:transform .25s ease}
+.fan button{position:absolute;bottom:0;left:50%;width:clamp(84px,11vw,132px);aspect-ratio:63/88;border:0;padding:0;background:#30623055;border-radius:6px;transform-origin:50% 120%;box-shadow:4px 6px 0 rgba(20,40,15,.35);transition:transform .25s ease}
 .fan button img{width:100%;height:100%;object-fit:cover;border-radius:6px;display:block}
-.fan .tag{position:absolute;left:50%;bottom:-6px;transform:translate(-50%,100%);background:#0f380f;color:#cadc9f;font:700 13px/1 Archivo,sans-serif;font-stretch:85%;padding:4px 7px;border-radius:5px;white-space:nowrap;opacity:0;transition:opacity .2s}
+.fan .tag{position:absolute;left:50%;bottom:-6px;transform:translate(-50%,100%);background:#39486a;color:#fff;font:700 13px/1 Archivo,sans-serif;font-stretch:85%;padding:4px 7px;border-radius:5px;white-space:nowrap;opacity:0;transition:opacity .2s}
 .fan button:hover .tag,.fan button:focus-visible .tag{opacity:1}
 .fancap{text-align:center;font-size:13px;color:#ffe0d9;margin-top:30px}
 /* holo foil */
@@ -65,25 +73,25 @@ button{cursor:pointer}
 /* chart controls */
 .ctrl{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;justify-content:space-between;margin:18px 0 8px}
 .tabs{display:flex;flex-wrap:wrap;gap:6px}
-.tab{min-height:38px;padding:5px 13px;border-radius:999px;border:1px solid rgba(202,220,159,.45);background:transparent;color:#cadc9f;font-size:14px;display:inline-flex;align-items:center;gap:6px}
+.tab{min-height:38px;padding:5px 13px;border-radius:999px;border:1px solid rgba(238,246,224,.45);background:transparent;color:#eef6e0;font-size:14px;display:inline-flex;align-items:center;gap:6px}
 .tab:disabled{opacity:.4;cursor:not-allowed}
-.tab[aria-pressed=true]{background:#cadc9f;color:#0f380f;border-color:#cadc9f;font-weight:600}
+.tab[aria-pressed=true]{background:#eef6e0;color:#1c3a24;border-color:#eef6e0;font-weight:600}
 .fig{position:relative;min-height:320px}.fig>svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 .fig.s{min-height:220px}.fig.xs{min-height:150px}
 .tip{position:absolute;pointer-events:none;background:#111;color:#fff;padding:6px 9px;border-radius:6px;font-size:13px;line-height:1.35;white-space:nowrap;transform:translate(-50%,-112%);display:none;z-index:2}
-.chartnote{font-size:13px;color:#a9be7f;margin:6px 0 0}
+.chartnote{font-size:13px;color:#b5cba6;margin:6px 0 0}
 .cardnote{font-size:13px;color:var(--mute);margin:6px 0 0}
 .early{background:rgba(0,0,0,.18);border-radius:12px;padding:16px;min-height:300px}
-.early p{margin:0 0 12px;color:#cadc9f;font-size:15px;max-width:72ch}
+.early p{margin:0 0 12px;color:#eef6e0;font-size:15px;max-width:72ch}
 .mrow{display:grid;grid-template-columns:130px minmax(0,1fr) 64px;gap:10px;align-items:center;margin:12px 0;font-size:15px}
 .mbar{height:12px;background:rgba(255,255,255,.18);border-radius:6px;position:relative}
 .mbar i{position:absolute;top:0;bottom:0;border-radius:6px}
 .mbar .mid{position:absolute;left:50%;top:-4px;bottom:-4px;width:2px;background:rgba(255,255,255,.8)}
 .tiles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:18px}
-.tile{background:rgba(202,220,159,.07);border:0;color:#cadc9f;text-align:left;border-radius:12px;padding:12px;min-height:44px;border-top:4px solid var(--c)}
-.tile[aria-pressed=true]{outline:2px solid #cadc9f}
+.tile{background:rgba(238,246,224,.07);border:0;color:#eef6e0;text-align:left;border-radius:12px;padding:12px;min-height:44px;border-top:4px solid var(--c)}
+.tile[aria-pressed=true]{outline:2px solid #eef6e0}
 .tile .n{font-size:26px;font-weight:700;line-height:1.1;display:block}
-.tile small{display:block;color:#a9be7f;font-size:13px}
+.tile small{display:block;color:#b5cba6;font-size:13px}
 /* sheet */
 .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(18px,3vw,40px)}
 .panel-c{background:var(--card);border-radius:14px;padding:16px}
@@ -161,15 +169,15 @@ details summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;alig
 <section class="band board">
   <canvas id="world" aria-hidden="true"></canvas>
   <div class="wrap">
-    <div class="top"><h1>UK Pokémon Card Index</h1><div class="meta" id="meta">Loading prices…</div></div>
+    <div class="top"><div class="dlg"><h1>UK Pokémon Card Index</h1><div class="meta" id="meta">Loading prices…</div></div></div>
     <div class="hero">
-      <div>
+      <div class="dlg">
         <div class="seglabel" id="seglabel"></div>
         <div class="big num" id="big">—</div>
         <div class="chips" id="chips"></div>
         <div class="stat" id="stat"></div>
       </div>
-      <div><div class="fan" id="fan" aria-label="Most valuable blue-chip cards"></div><div class="fancap" id="fancap"></div></div>
+      <div class="fanwrap"><div class="fan" id="fan" aria-label="Most valuable blue-chip cards"></div><div class="fancap" id="fancap"></div></div>
     </div>
     <div class="lane" id="lane" aria-hidden="true"></div>
     <div class="ctrl"><div class="tabs" id="ranges"></div><div class="tabs" id="modes"></div></div>
@@ -385,7 +393,7 @@ function renderBoard() {
     if (mode === 'compare') {
       const series = SEGS.map(([key, nm, , col]) => { const pts = segSeries(key).filter((p) => tms(p[0]) >= cut); const b = pts[0]?.[1]; return { name: nm, color: col, pts: pts.map((p) => [p[0], b ? (p[1] / b - 1) * 100 : null, p[2]]) }; });
       chart(box, series, { label: 'Index groups compared', fmt: (v) => pct(v, 1), zero: 0, estLabel: (i, ref) => estLabel(i, ref, anchorEst) });
-    } else chart(box, [{ name, color: '#cadc9f', pts: segSeries(seg).filter((p) => tms(p[0]) >= cut) }], { label: name + ' index', estLabel: (i, ref) => estLabel(i, ref, anchorEst) });
+    } else chart(box, [{ name, color: '#ffd76a', pts: segSeries(seg).filter((p) => tms(p[0]) >= cut) }], { label: name + ' index', estLabel: (i, ref) => estLabel(i, ref, anchorEst) });
     const hasEst = segSeries(seg).some((p) => p[2]);
     $('#chartnote').textContent = (hasEst ? `Dashed: estimated from Cardmarket's 30-day and 7-day averages, placed mid-window. Solid: the nightly index, from ${dfmt(dates[0])}. ` : '') + (RANGES.some(([, d]) => d && !usable(d)) ? `The chart covers ${Math.round(spanDays)} days so far; longer ranges switch on as nightly history builds.` : '');
   } else {
@@ -620,108 +628,198 @@ load();
 }
 </script>
 <script>
-// ---- Pixel world: an original Game Boy-style scene drawn on a canvas behind the board ----
+// ---- Top-down village (GBA style): an original pixel scene behind the board ----
 (() => {
   const board = document.querySelector('.board'), lane = document.getElementById('lane'), cv = document.getElementById('world');
   if (!board || !lane || !cv) return;
   const ctx = cv.getContext('2d');
-  const P = { 0: '#cadc9f', 1: '#8bac0f', 2: '#306230', 3: '#0f380f', w: '#eef6d6' };
-  const SKY = P[0], LH = 54; // lane height in art pixels
-  const sprite = (rows) => { const c = document.createElement('canvas'); c.width = rows[0].length; c.height = rows.length; const g = c.getContext('2d'); rows.forEach((r, y) => [...r].forEach((ch, x) => { if (P[ch]) { g.fillStyle = P[ch]; g.fillRect(x, y, 1, 1); } })); return c; };
-  // Walker: an original explorer with a wide-brim hat, scarf and backpack (16x16, facing right).
-  const top = [
-    '......33333.....',
-    '.....3222223....',
-    '.....3222223....',
-    '...33333333333..',
-    '.....33000003...',
-    '.....33000303...',
-    '.....330000003..',
-    '......3300003...',
-    '...2222222......',
-    '..2323111133....',
-    '...323111113....',
-    '...333111333....'];
-  const legsA = ['......3113......', '.....31..13.....', '....31....13....', '....33....33....'];
-  const legsP = ['......3113......', '......3113......', '......3123......', '......3333......'];
-  const legsB = ['......3113......', '.....32..13.....', '....32....13....', '....33....33....'];
-  const topSwing = top.map((r, i) => i === 10 ? '...3231111103...' : i === 11 ? '...33311133.3...' : r);
-  const frames = [sprite([...top, ...legsA]), sprite(['................', ...topSwing, ...legsP.slice(0, 3)]), sprite([...topSwing, ...legsB]), sprite(['................', ...top, ...legsP.slice(0, 3)])];
-  const tree = sprite([
-    '.....333333.....', '...3322222233...', '..322211222223..', '.32221112222223.', '.32211122222223.', '3222111222222223', '3222222222212223', '3222222222112223', '.32222222211223.', '.32222222222223.', '..322222222223..', '...3322222233...', '.....333333.....', '......3113......', '......3113......', '......3123......', '.....331233.....']);
-  const bush = sprite(['..33333...', '.3221123..', '322211223.', '3222222233', '.33333333.']);
-  const flowerA = sprite(['.0.', '030', '.0.', '.2.']), flowerB = sprite(['0..', '30.', '0..', '.2.']);
-  const tuft = sprite(['2.2.2', '.222.']);
-  // Seeded layout on a repeating loop.
-  let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-  const LOOP = 1800;
-  const mid = []; for (let x = 10; x < LOOP - 60;) { const r = rnd(); if (r < .32) { mid.push({ t: 'tree', x }); x += 18 + rnd() * 22; } else if (r < .46) { mid.push({ t: 'house', x, v: rnd() }); x += 44 + rnd() * 20; } else if (r < .6) { const n = 2 + Math.floor(rnd() * 4); mid.push({ t: 'fence', x, n }); x += n * 6 + 10; } else if (r < .66) { mid.push({ t: 'sign', x }); x += 18; } else if (r < .8) { mid.push({ t: 'bush', x }); x += 14; } else x += 20 + rnd() * 30; }
-  const far = []; for (let x = 0; x < LOOP;) { far.push({ x, h: 4 + rnd() * 5, r: 3 + rnd() * 3 }); x += 7 + rnd() * 12; }
-  const clouds = []; for (let x = 0; x < LOOP;) { clouds.push({ x, y: rnd(), w: 14 + rnd() * 18 }); x += 60 + rnd() * 120; }
-  const deco = []; for (let x = 0; x < LOOP;) { deco.push({ x, t: rnd() < .45 ? 'flower' : 'tuft', row: rnd() < .5 ? 0 : 1 }); x += 3 + rnd() * 9; }
-  let S = 4, W = 0, H = 0, laneTop = 0, tick = 0, running = true;
-  function size() {
-    S = innerWidth < 600 ? 3 : 4;
-    lane.style.height = LH * S + 'px';
+  const SPR = {"DOWN": ["....oooooooo....", "...ohhhhhhhho...", "..ohwhhhhhhhho..", ".oHHHHHHHHHHHHo.", "..oossssssssoo..", "...osesssseso...", "...osssssssso...", "....occcccco....", "...ojjccccjjo...", "..osjjjjjjjjso..", "..osjJjjjjJjso..", "...ojJjjjjJjo...", "....oppppppo....", "....opo..opo....", "....oBo..oBo....", "....ooo..ooo...."], "DOWN_A": ["....oooooooo....", "...ohhhhhhhho...", "..ohwhhhhhhhho..", ".oHHHHHHHHHHHHo.", "..oossssssssoo..", "...osesssseso...", "...osssssssso...", "....occcccco....", "...ojjccccjjo...", "..osjjjjjjjjso..", "..osjJjjjjJjso..", "...ojJjjjjJjo...", "....oppppppo....", "....opo..opo....", "....oBo..ooo....", "....ooo........."], "DOWN_B": ["....oooooooo....", "...ohhhhhhhho...", "..ohwhhhhhhhho..", ".oHHHHHHHHHHHHo.", "..oossssssssoo..", "...osesssseso...", "...osssssssso...", "....occcccco....", "...ojjccccjjo...", "..osjjjjjjjjso..", "..osjJjjjjJjso..", "...ojJjjjjJjo...", "....oppppppo....", "....opo..opo....", "....ooo..oBo....", ".........ooo...."], "UP": ["....oooooooo....", "...ohhhhhhhho...", "..ohhhhhhhhhho..", ".oHHHHHHHHHHHHo.", "..ooHHHHHHHHoo..", "...osssssssso...", "....occcccco....", "...obbbbbbbbo...", "..osbbbbbbbbso..", "..osbBbbbbBbso..", "..ojbbbbbbbbjo..", "...ojbbbbbbjo...", "....oppppppo....", "....opo..opo....", "....oBo..oBo....", "....ooo..ooo...."], "UP_A": ["....oooooooo....", "...ohhhhhhhho...", "..ohhhhhhhhhho..", ".oHHHHHHHHHHHHo.", "..ooHHHHHHHHoo..", "...osssssssso...", "....occcccco....", "...obbbbbbbbo...", "..osbbbbbbbbso..", "..osbBbbbbBbso..", "..ojbbbbbbbbjo..", "...ojbbbbbbjo...", "....oppppppo....", "....opo..opo....", "....oBo..ooo....", "....ooo........."], "UP_B": ["....oooooooo....", "...ohhhhhhhho...", "..ohhhhhhhhhho..", ".oHHHHHHHHHHHHo.", "..ooHHHHHHHHoo..", "...osssssssso...", "....occcccco....", "...obbbbbbbbo...", "..osbbbbbbbbso..", "..osbBbbbbBbso..", "..ojbbbbbbbbjo..", "...ojbbbbbbjo...", "....oppppppo....", "....opo..opo....", "....ooo..oBo....", ".........ooo...."], "SIDE": [".....ooooooo....", "....ohhhhhhho...", "...ohhwhhhhhho..", "..oHHHHHHHHHHHHo", "...ooosssssoo...", "....obssseso....", "....obsssssso...", "....obbccccco...", "...obbbjjjjo....", "...obbbjjjjo....", "...obbjJjsjo....", "....oojJjjo.....", ".....oppppo.....", ".....opoopo.....", ".....oBooBo.....", ".....oooooo....."], "SIDE_A": [".....ooooooo....", "....ohhhhhhho...", "...ohhwhhhhhho..", "..oHHHHHHHHHHHHo", "...ooosssssoo...", "....obssseso....", "....obsssssso...", "....obbccccco...", "...obbbjjjjo....", "...obbbjjjjo....", "...obbjJjsjo....", "....oojJjjo.....", ".....oppppo.....", "....opo..opo....", "...oBo....oBo...", "...ooo....ooo..."], "SIDE_B": [".....ooooooo....", "....ohhhhhhho...", "...ohhwhhhhhho..", "..oHHHHHHHHHHHHo", "...ooosssssoo...", "....obssseso....", "....obsssssso...", "....obbccccco...", "...obbbjjjjo....", "...obbbjjjjo....", "...obbjJjsjo....", "....oojJjjo.....", ".....oppppo.....", ".....oppppo.....", ".....oBBBBo.....", ".....oooooo....."]};
+  const S = { name: 'gba', out: '#33402a',
+    grass: ['#b4e888', '#88d060', '#60b048', '#3c8434'], path: ['#f4e4b8', '#e2cc94', '#c4a86c', '#8c7448'], tall: ['#6cc050', '#4a9c3c', '#2f7a2c', '#1d5420'],
+    water: ['#e0f8ff', '#78ccf4', '#4a9ee4', '#2c6cb8'], tree: ['#a4e070', '#6cbc4c', '#428e38', '#24602a'], trunk: ['#b0804c', '#6c4428'],
+    roofA: ['#ffa890', '#ec6448', '#c03c2c', '#7c2018'], roofB: ['#a0c8ff', '#5c8ce8', '#3c64c0', '#24387c'], wall: ['#fffcf0', '#f2e8d4', '#d4c4a4', '#7a6c58'],
+    wood: ['#f4cc90', '#d09858', '#9c6c38', '#5c3c1c'], win: ['#4c80d8', '#c8e8ff'], flower: ['#ff6c84', '#ffe46c', '#ffffff'],
+    chr: { o: '#2a3420', h: '#ecc870', H: '#b08838', w: '#fff4c8', s: '#fcd0a4', e: '#2a3420', c: '#30c4b0', j: '#f88c3c', J: '#c0641c', p: '#40548c', b: '#946238', B: '#583420' } };
+  const gba = true, dmg = false, T = 16;
+  const px = (c, x, y, w = 1, h = 1) => { ctx.fillStyle = c; ctx.fillRect(x, y, w, h); };
+  const hash = (x, y, k = 0) => { let n = (x * 374761393 + y * 668265263 + k * 2147483647) | 0; n = (n ^ (n >>> 13)) * 1274126177; return ((n ^ (n >>> 16)) >>> 0) / 4294967296; };
+  let TW = 0, TH = 0, M = [], objects = [], flowers = [], way = [], Z = 2, offY = 0, Wpx = 0;
+  let wi = 0, wx = 0, wy = 0, wait = 0, dir = 'SIDE', flip = false, dist = 0, t = 0;
+  const isW = (c, r) => r >= 0 && r < TH && c >= 0 && c < TW && M[r][c] === 'w';
+  const isP = (c, r) => r >= 0 && r < TH && c >= 0 && c < TW && M[r][c] === 'p';
+  function build() {
+    Z = innerWidth >= 1700 ? 3 : 2;
+    const B = 8; // village band, in tiles, sits at the bottom of the scene
+    lane.style.height = B * T * Z + 'px';
     const b = board.getBoundingClientRect(), l = lane.getBoundingClientRect();
-    const hpx = l.bottom - b.top;
-    W = Math.ceil(b.width / S); H = Math.ceil(hpx / S); laneTop = H - LH;
-    cv.width = W; cv.height = H; cv.style.width = W * S + 'px'; cv.style.height = H * S + 'px';
-    draw();
-  }
-  const wrap = (x, off) => { let p = (x - off) % LOOP; if (p < -60) p += LOOP; return p; };
-  function house(x, y, v) {
-    const w = 34, wallH = 15, roofH = 11, gy = y - wallH - roofH;
-    ctx.fillStyle = P[3]; ctx.fillRect(x + w - 9, gy - 4, 4, 6); // chimney
-    for (let r = 0; r < roofH; r++) { const inset = Math.round((roofH - 1 - r) * 0.45); ctx.fillStyle = r === 0 || r % 3 === 2 ? P[3] : P[2]; ctx.fillRect(x - 1 + inset, gy + r, w + 2 - inset * 2, 1); }
-    ctx.fillStyle = P[3]; ctx.fillRect(x, gy + roofH, w, wallH);
-    ctx.fillStyle = v > .5 ? P[0] : P['w']; ctx.fillRect(x + 1, gy + roofH, w - 2, wallH - 1);
-    ctx.fillStyle = P[3]; ctx.fillRect(x + 14, y - 9, 6, 9); ctx.fillStyle = P[1]; ctx.fillRect(x + 18, y - 5, 1, 1);
-    for (const wx of [x + 4, x + 24]) { ctx.fillStyle = P[3]; ctx.fillRect(wx, y - 12, 6, 6); ctx.fillStyle = P[2]; ctx.fillRect(wx + 1, y - 11, 4, 4); ctx.fillStyle = P[0]; ctx.fillRect(wx + 1, y - 9, 4, 1); ctx.fillRect(wx + 3, y - 11, 1, 4); }
-  }
-  function draw() {
-    if (!W) return;
-    const gx = tick; // ground scroll in art px
-    ctx.fillStyle = SKY; ctx.fillRect(0, 0, W, H);
-    // clouds drift slowly
-    for (const c of clouds) { const x = Math.round(wrap(c.x, gx * 0.15 + tick * 0.05)); if (x > W + 40) continue; const y = Math.round(4 + c.y * Math.max(8, laneTop * 0.55)); ctx.fillStyle = P.w; ctx.fillRect(x + 4, y, c.w - 10, 1); ctx.fillRect(x + 2, y + 1, c.w - 5, 1); ctx.fillRect(x, y + 2, c.w, 2); ctx.fillRect(x + 1, y + 4, c.w - 2, 1); }
-    // far trees on a low ridge, just above the lane
-    // distant tree line: rounded crowns, checker-dithered so they read as far away
-    const ridge = laneTop + 16;
-    ctx.fillStyle = P[1]; ctx.fillRect(0, ridge, W, LH);
-    for (const f of far) { const cx0 = Math.round(wrap(f.x, gx * 0.3)); if (cx0 > W + 10 || cx0 < -10) continue; const r = Math.round(f.r), cy = ridge - Math.round(f.h * 0.5);
-      for (let yy = -r; yy <= r; yy++) for (let xx = -r; xx <= r; xx++) { if (xx * xx + yy * yy > r * r + r * 0.6) continue; const px = cx0 + xx, py = cy + yy; if (py > ridge) continue; ctx.fillStyle = ((px + py) & 1) && yy < 0 ? P[0] : P[1]; ctx.fillRect(px, py, 1, 1); }
-      ctx.fillRect(cx0, cy + r, 1, ridge - cy - r + 1); }
-    // ground: grass, path, grass
-    const gTop = laneTop + 30, pathTop = gTop + 6, pathBot = pathTop + 11;
-    ctx.fillStyle = P[1]; ctx.fillRect(0, ridge + 1, W, LH);
-    ctx.fillStyle = P[0]; ctx.fillRect(0, pathTop, W, pathBot - pathTop);
-    ctx.fillStyle = P[1]; for (let x = -(gx % 8); x < W; x += 8) { ctx.fillRect(x + 1, pathTop + 3, 1, 1); ctx.fillRect(x + 5, pathTop + 7, 1, 1); ctx.fillRect(x + 3, pathTop, 2, 1); ctx.fillRect(x + 6, pathBot - 1, 2, 1); }
-    // mid layer: trees, houses, fences, signs, bushes standing on the grass behind the path
-    const base = pathTop;
-    for (const o of mid) {
-      const x = Math.round(wrap(o.x, gx * 0.75)); if (x > W + 40 || x < -50) continue;
-      if (o.t === 'tree') ctx.drawImage(tree, x, base - 17);
-      else if (o.t === 'bush') ctx.drawImage(bush, x, base - 5);
-      else if (o.t === 'house') house(x, base, o.v);
-      else if (o.t === 'fence') { ctx.fillStyle = P[2]; ctx.fillRect(x, base - 5, o.n * 6 + 1, 1); ctx.fillRect(x, base - 3, o.n * 6 + 1, 1); ctx.fillStyle = P[3]; for (let i = 0; i <= o.n; i++) ctx.fillRect(x + i * 6, base - 7, 1, 7); }
-      else if (o.t === 'sign') { ctx.fillStyle = P[3]; ctx.fillRect(x + 4, base - 4, 1, 4); ctx.fillRect(x, base - 10, 9, 6); ctx.fillStyle = P[0]; ctx.fillRect(x + 1, base - 9, 7, 4); ctx.fillStyle = P[2]; ctx.fillRect(x + 2, base - 8, 5, 1); ctx.fillRect(x + 2, base - 6, 3, 1); }
+    const hCss = l.bottom - b.top;
+    TW = Math.ceil(b.width / (T * Z)) + 1; TH = Math.ceil(hCss / (T * Z));
+    const artH = Math.ceil(hCss / Z); offY = artH - TH * T; Wpx = TW * T;
+    cv.width = Wpx; cv.height = artH; cv.style.width = Wpx * Z + 'px'; cv.style.height = artH * Z + 'px';
+    M = Array.from({ length: TH }, () => Array(TW).fill('g'));
+    const set = (c, r, v) => { if (r >= 0 && r < TH && c >= 0 && c < TW) M[r][c] = v; };
+    const pr = TH - 3; // main path rows pr, pr+1
+    for (let c = 0; c < TW; c++) { set(c, pr, 'p'); set(c, pr + 1, 'p'); }
+    objects = []; flowers = []; way = [];
+    const tree = (c, r) => objects.push({ k: 'tree', x: c * T, y: r * T, z: r * T + 32 });
+    // houses along the band, alternating roofs
+    const houses = []; let hx = 3 + Math.floor(hash(1, 2) * 4), n = 0;
+    while (hx + 5 < TW) { houses.push(hx); hx += 9 + Math.floor(hash(hx, 7) * 6); }
+    const used = new Set();
+    for (const h of houses) {
+      const hr = TH - 8, roof = ['roofA', 'roofB', 'roofC'][n++ % 3];
+      objects.push({ k: 'house', x: h * T, y: hr * T, roof, z: (hr + 4) * T });
+      set(h + 2, pr - 1, 'p');
+      for (const c of [h, h + 1, h + 3, h + 4]) flowers.push([c, pr - 1]);
+      for (let c = h - 1; c <= h + 5; c++) used.add(c);
     }
-    // foreground decoration on the grass strips
-    for (const d of deco) { const x = Math.round(wrap(d.x, gx)); if (x > W + 6) continue; const y = d.row ? pathBot + 2 + (d.x % 4) : gTop + 1 + (d.x % 3);
-      if (d.t === 'flower') ctx.drawImage((tick >> 3) % 2 ? flowerA : flowerB, x, y); else ctx.drawImage(tuft, x, y + 1); }
-    // walker
-    const f = frames[(tick >> 2) % 4], cx = Math.round(W * (innerWidth < 600 ? 0.22 : 0.16));
-    ctx.fillStyle = P[1]; ctx.fillRect(cx + 4, pathTop + 9, 8, 1);
-    ctx.drawImage(f, cx, pathTop - 6);
+    // trees and signs between houses, fences beside flower beds
+    for (let c = 0; c < TW; c += 2) if (![...Array(2).keys()].some((k) => used.has(c + k))) { if (hash(c, 3) < .55) tree(c, TH - 7); else if (hash(c, 4) < .5) objects.push({ k: 'fence', x: c * T, y: (pr - 1) * T, n: 2, z: (pr - 1) * T + 12 }); else flowers.push([c, TH - 6], [c + 1, pr - 1]); }
+    for (let c = 0; c < TW; c++) if (!used.has(c) && hash(c, 9) < .12) objects.push({ k: 'sign', x: c * T, y: (pr - 1) * T - 4, z: (pr - 1) * T + 6 });
+    // bottom row: tall grass patches, a pond, flowers
+    let c = 0;
+    while (c < TW) { const r = hash(c, 11); const len = 3 + Math.floor(hash(c, 12) * 5);
+      if (r < .35) { for (let k = 0; k < len; k++) set(c + k, TH - 1, 't'); }
+      else if (r < .55) { for (let k = 0; k < len + 1; k++) set(c + k, TH - 1, 'w'); }
+      else for (let k = 0; k < len; k++) if (hash(c + k, 13) < .4) flowers.push([c + k, TH - 1]);
+      c += len + 1 + Math.floor(hash(c, 14) * 3); }
+    // the field above the village: a tree line along the top, a few trees and flowers
+    for (let c2 = -1; c2 < TW; c2 += 2) tree(c2, -1);
+    for (let r = 1; r < TH - 9; r++) for (let c2 = 0; c2 < TW; c2 += 2) { const h2 = hash(c2, r, 21); if (h2 < .07) tree(c2, r); else if (h2 < .16) flowers.push([c2, r]); }
+    // walker route: along the path, visiting each front door
+    const PY = pr * T + 6, DOOR = (TH - 4) * T - 13;
+    way = [[-16, PY]];
+    for (const h of houses) if (hash(h, 31) < .7) { const x = (h + 2) * T; way.push([x, PY], [x, DOOR], [x, DOOR, 45], [x, PY]); }
+    way.push([Wpx + 16, PY]);
+    wi = 0; wx = way[0][0]; wy = way[0][1]; wait = 0;
+    frame();
+  }
+  S.roofC = ['#c8e890', '#7cbc58', '#4e8c3c', '#2c5424'];
+  // ---- tiles ----
+  function grassTile(c, r, t) {
+    const g = S.grass; px(g[1], c * T, r * T, T, T);
+    if (gba && hash(c >> 1, r >> 1, 3) < .4) { for (let yy = 0; yy < T; yy++) for (let xx = (yy & 1); xx < T; xx += 2) px('#7cc458', c * T + xx, r * T + yy); }
+    for (let i = 0; i < (gba ? 9 : 4); i++) { const x = Math.floor(hash(c, r, i) * 15), y = Math.floor(hash(r, c, i + 9) * 14);
+      if (gba) { px(g[2], c * T + x, r * T + y + 1); px(g[0], c * T + x, r * T + y); } else { px(g[2], c * T + x, r * T + y, 1, 1); px(g[2], c * T + x + 2, r * T + y, 1, 1); px(g[2], c * T + x + 1, r * T + y + 1); } }
+    if (gba && hash(c, r, 77) < .35) { const x = c * T + 3 + Math.floor(hash(c, r, 5) * 9), y = r * T + 4 + Math.floor(hash(c, r, 6) * 8); px(g[0], x, y, 2, 1); px(g[0], x + 1, y - 1); }
+  }
+  function pathTile(c, r) {
+    const p = S.path; px(p[1], c * T, r * T, T, T);
+    for (let i = 0; i < (gba ? 6 : 3); i++) { const x = Math.floor(hash(c, r, i + 30) * 14), y = Math.floor(hash(c, r, i + 40) * 14); px(p[2], c * T + x, r * T + y, gba ? 2 : 1, 1); if (gba) px(p[0], c * T + x, r * T + y - 1, 2, 1); }
+    // edges against grass
+    const g = S.grass, e = gba ? p[3] : p[2];
+    if (!isP(c, r - 1)) { px(e, c * T, r * T, T, 1); if (gba) px(p[2], c * T, r * T + 1, T, 1); for (let x = 0; x < T; x += 4) px(g[1], c * T + x + (r & 1) * 2, r * T, 2, 1); }
+    if (!isP(c, r + 1)) { px(e, c * T, r * T + T - 1, T, 1); for (let x = 0; x < T; x += 4) px(g[1], c * T + x + 1, r * T + T - 1, 2, 1); }
+    if (!isP(c - 1, r) && c > 0) { px(e, c * T, r * T, 1, T); }
+    if (!isP(c + 1, r) && c < TW - 1) { px(e, c * T + T - 1, r * T, 1, T); }
+  }
+  function tallTile(c, r, t) {
+    const g = S.tall; px(S.grass[1], c * T, r * T, T, T);
+    const sway = Math.floor(t / 20 + c) % 2;
+    for (let yy = 0; yy < 2; yy++) for (let xx = 0; xx < 2; xx++) { const x = c * T + xx * 8, y = r * T + yy * 8;
+      px(g[2], x + 1, y + 3, 6, 5); px(g[1], x + 1, y + 2, 6, 3);
+      px(g[1], x + 1 + sway, y, 1, 3); px(g[1], x + 4, y + sway, 1, 3); px(g[1], x + 6 - sway, y + 1, 1, 2);
+      px(g[3], x + 1, y + 7, 6, 1); if (!dmg) { px(g[0], x + 2, y + 2, 1, 1); px(g[0], x + 5, y + 3, 1, 1); } }
+  }
+  function waterTile(c, r, t) {
+    const w = S.water; px(w[1], c * T, r * T, T, T);
+    const ph = Math.floor(t / 12);
+    for (let i = 0; i < 3; i++) { const y = r * T + 3 + i * 5, x = c * T + ((ph + i * 5 + c * 3) % 12);
+      px(w[0], x, y, 3, 1); if (!dmg) px(w[2], x + 1, y + 1, 3, 1); }
+    if (gba) { if ((ph + c + r) % 5 === 0) px('#ffffff', c * T + 8, r * T + 6);
+      if (hash(c, r, 99) < .3 && isW(c, r - 1)) { const lx = c * T + 4, ly = r * T + 6; px('#3c8c3c', lx, ly, 6, 4); px('#5cb04c', lx + 1, ly, 4, 3); px(w[1], lx + 3, ly, 1, 2); if (hash(c, r, 5) < .5) px('#ffb0c8', lx + 1, ly + 1, 2, 1); } }
+    const sh = S.grass, edge = w[3];
+    if (!isW(c, r - 1)) { px(gba ? S.path[1] : sh[1], c * T, r * T, T, 2); px(edge, c * T, r * T + 2, T, 1); if (!dmg) px(w[2], c * T, r * T + 3, T, 1); }
+    if (!isW(c - 1, r)) { px(gba ? S.path[1] : sh[1], c * T, r * T, 2, T); px(edge, c * T + 2, r * T + (isW(c, r - 1) ? 0 : 2), 1, T); }
+    if (!isW(c + 1, r)) { px(gba ? S.path[1] : sh[1], c * T + T - 2, r * T, 2, T); px(edge, c * T + T - 3, r * T + (isW(c, r - 1) ? 0 : 2), 1, T); }
+  }
+  // ---- objects ----
+  function drawTree(x, y) {
+    const tr = S.tree;
+    if (gba) { ctx.fillStyle = 'rgba(20,40,10,.22)'; ctx.beginPath(); ctx.ellipse(x + 17, y + 29, 13, 4, 0, 0, 7); ctx.fill(); }
+    px(S.trunk[1], x + 13, y + 22, 6, 8); px(S.trunk[0], x + 14, y + 22, 3, 7); px(S.out, x + 12, y + 29, 8, 1);
+    const R = 14, cx = x + 16, cy = y + 13;
+    for (let yy = -R; yy <= R; yy++) for (let xx = -R; xx <= R; xx++) { const d = xx * xx + yy * yy * 1.15; if (d > R * R) continue;
+      let col = tr[1]; const l = (xx + yy) / R;
+      if (d > (R - 1.3) * (R - 1.3)) col = gba ? tr[3] : S.out; else if (l > .55) col = tr[2]; else if (gba && l > .1) col = (xx + yy) & 1 ? tr[1] : tr[2]; else if (l < -.75 || (!dmg && l < -.45 && (xx & 1))) col = tr[0];
+      px(col, cx + xx, cy + yy); }
+    // leaf clumps
+    for (const [ax, ay] of [[-6, -4], [3, -7], [5, 2], [-3, 5]]) { px(tr[2], cx + ax, cy + ay + 2, 4, 1); px(tr[0], cx + ax, cy + ay, 2, 1); }
+    if (gba) { for (const [ax, ay] of [[-8, -7], [-4, -10], [0, -6], [-9, -1], [-5, -3]]) px('#d8f4a0', cx + ax, cy + ay, 1, 1); px(tr[0], cx - 7, cy - 6, 3, 2); }
+  }
+  function drawHouse(o) {
+    const { x, y } = o, R = S[o.roof], wl = S.wall, w = 80;
+    if (gba) { ctx.fillStyle = 'rgba(20,40,10,.22)'; ctx.fillRect(x + 4, y + 60, w, 6); }
+    // walls (front face)
+    px(S.out, x + 2, y + 34, w - 4, 30); px(wl[1], x + 3, y + 35, w - 6, 28);
+    if (!dmg) { px(wl[2], x + 3, y + 59, w - 6, 4); for (let i = 0; i < w - 6; i += 6) px(wl[2], x + 3 + i, y + 35, 1, 24); }
+    else { px(wl[2], x + 3, y + 60, w - 6, 3); }
+    // door
+    px(S.out, x + 33, y + 44, 14, 20); px(S.wood[2], x + 34, y + 45, 12, 19); px(S.wood[1], x + 35, y + 46, 10, 7); px(S.wood[1], x + 35, y + 55, 10, 8); px(S.wood[0], x + 43, y + 55, 1, 2);
+    px(S.path[2], x + 31, y + 63, 18, 1);
+    if (gba) { px('#b8b0a0', x + 32, y + 63, 16, 3); px('#d8d0c0', x + 33, y + 63, 14, 1);
+      for (const wx of [x + 10, x + 56]) { px('#9c6c38', wx - 1, y + 54, 16, 3); for (let i = 0; i < 5; i++) { px('#4a9c3c', wx + 1 + i * 3, y + 52, 2, 2); px(i % 2 ? '#ff6c84' : '#ffe46c', wx + 1 + i * 3, y + 51, 1, 1); } } }
+    // windows
+    for (const wx of [x + 10, x + 56]) { px(S.out, wx, y + 42, 14, 12); px(S.win[0], wx + 1, y + 43, 12, 10); px(S.win[1], wx + 2, y + 44, 4, 3); if (gba) px('#ffffff', wx + 2, y + 44, 2, 1); px(S.out, wx + 7, y + 43, 1, 10); px(S.out, wx + 1, y + 48, 12, 1); px(S.wood[1], wx - 1, y + 54, 16, 2); }
+    // roof (seen from above at an angle): back slope lighter, front slope darker, ridge between
+    px(S.out, x, y, w, 36);
+    for (let r = 1; r < 35; r++) { const back = r < 14; let col = back ? R[0] : R[1]; if (r === 14) col = R[3]; if (!back && r > 28) col = R[2];
+      px(col, x + 1, y + r, w - 2, 1);
+      if (!dmg && (r % 4 === 0)) for (let i = (r % 8 ? 0 : 5); i < w - 2; i += 10) px(back ? R[1] : R[2], x + 1 + i, y + r, 1, 4);
+      if (gba && r % 4 === 1) px(back ? '#ffffff22' : R[2], x + 1, y + r, w - 2, 1); }
+    px(R[3], x + 1, y + 34, w - 2, 1);
+    if (gba) { px(R[0], x + 1, y + 13, w - 2, 1); px('#ffffff55', x + 1, y + 1, w - 2, 1); }
+    // chimney
+    px(S.out, x + 60, y - 6, 10, 14); px(S.wall[2], x + 61, y - 5, 8, 12); px(S.wall[3], x + 61, y - 5, 8, 2);
+  }
+  function drawFence(o) {
+    const wd = S.wood, len = o.n * T;
+    px(S.out, o.x, o.y + 4, len, 4); px(wd[1], o.x, o.y + 5, len, 2);
+    for (let i = 0; i < o.n * 2 + 1; i++) { const fx = o.x + i * 8; if (fx > o.x + len - 2) break; px(S.out, fx, o.y, 4, 12); px(wd[0], fx + 1, o.y + 1, 2, 9); if (!dmg) px(wd[2], fx + 1, o.y + 9, 2, 2); }
+    if (gba) { ctx.fillStyle = 'rgba(20,40,10,.18)'; ctx.fillRect(o.x, o.y + 12, len, 2); }
+  }
+  function drawSign(o) {
+    const wd = S.wood;
+    px(S.out, o.x + 6, o.y + 8, 4, 8); px(wd[2], o.x + 7, o.y + 8, 2, 8);
+    px(S.out, o.x, o.y, 16, 10); px(wd[1], o.x + 1, o.y + 1, 14, 8); px(wd[0], o.x + 1, o.y + 1, 14, 2);
+    px(wd[3], o.x + 3, o.y + 4, 10, 1); px(wd[3], o.x + 3, o.y + 6, 7, 1);
+  }
+  function drawFlower(c, r, t, k) {
+    const f = S.flower, sw = Math.floor(t / 24 + k) % 2;
+    for (const [dx, dy, col] of [[3, 4, f[k % 2]], [10, 3, f[(k + 1) % 2]], [6, 10, f[2]]]) { const x = c * T + dx + (dy > 5 ? 0 : sw), y = r * T + dy;
+      px(S.grass[2], x + 1, y + 2, 1, 2); px(col, x, y, 3, 1); px(col, x + 1, y - 1, 1, 3); px(dmg ? S.out : '#f8d030', x + 1, y, 1, 1); }
+  }
+  function drawWalker(t) {
+    const anim = Math.floor(dist / 8) % 2, moving = wait === 0;
+    const key = dir + (moving ? (anim ? '_A' : '_B') : '');
+    const spr = SPR[key] || SPR[dir];
+    const x = Math.round(wx), y = Math.round(wy) - (moving && anim ? 1 : 0);
+    if (!dmg) { ctx.fillStyle = gba ? 'rgba(20,40,10,.25)' : S.grass[3]; ctx.beginPath(); ctx.ellipse(x + 8, Math.round(wy) + 15, 5, 2, 0, 0, 7); ctx.fill(); }
+    for (let r = 0; r < 16; r++) for (let c = 0; c < 16; c++) { const ch = spr[r][flip ? 15 - c : c]; const col = S.chr[ch]; if (col) px(col, x + c, y + r); }
+  }
+
+  function step() {
+    if (wait > 0) { wait--; if (wait === 0) wi++; return; }
+    const tgt = way[wi + 1]; if (!tgt) { wi = 0; wx = way[0][0]; wy = way[0][1]; return; }
+    const dx = Math.sign(tgt[0] - wx), dy = Math.sign(tgt[1] - wy);
+    if (dx) { dir = 'SIDE'; flip = dx < 0; } else if (dy) { dir = dy < 0 ? 'UP' : 'DOWN'; flip = false; }
+    wx += dx; wy += dy; dist++;
+    if (wx === tgt[0] && wy === tgt[1]) { if (tgt[2]) { wait = tgt[2]; dir = 'DOWN'; } else wi++; }
+  }
+  function frame() {
+    if (!TW) return;
+    ctx.setTransform(1, 0, 0, 1, 0, offY);
+    for (let r = 0; r < TH; r++) for (let c = 0; c < TW; c++) { const m = M[r][c]; if (m === 'p') pathTile(c, r); else if (m === 'w') waterTile(c, r, t); else if (m === 't') tallTile(c, r, t); else grassTile(c, r, t); }
+    flowers.forEach(([c, r], k) => drawFlower(c, r, t, k));
+    const list = objects.concat([{ k: 'walker', z: wy + 16 }]).sort((a, b) => a.z - b.z);
+    for (const o of list) { if (o.k === 'tree') drawTree(o.x, o.y); else if (o.k === 'house') drawHouse(o); else if (o.k === 'fence') drawFence(o); else if (o.k === 'sign') drawSign(o); else drawWalker(t); }
   }
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  let last = 0;
-  function loop(t) { if (running && t - last > 80) { last = t; tick++; draw(); } requestAnimationFrame(loop); }
-  new ResizeObserver(size).observe(board);
-  addEventListener('resize', size);
+  let last = 0, running = true, rt;
+  function loop(ts) { if (running && ts - last > 33) { last = ts; t++; step(); frame(); } requestAnimationFrame(loop); }
+  new ResizeObserver(() => { clearTimeout(rt); rt = setTimeout(build, 60); }).observe(board);
   if (!still) { new IntersectionObserver((e) => { running = e[0].isIntersecting && !document.hidden; }).observe(cv); document.addEventListener('visibilitychange', () => { running = !document.hidden; }); requestAnimationFrame(loop); }
-  size();
+  build();
 })();
 </script>
 </body>
