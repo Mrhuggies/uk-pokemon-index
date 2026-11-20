@@ -259,7 +259,7 @@ function renderBoard() {
 
 function cardRow(r, extra = '') {
   const c30 = r.avg7 && r.avg30 ? (r.avg7 / r.avg30 - 1) * 100 : null;
-  return `<button type="button" class="row" data-id="${esc(r.id)}">${r.img ? `<img src="${esc(r.img)}" alt="" loading="lazy">` : '<span class="ph"></span>'}<span><span class="t">${esc(r.name)}</span><br><span class="s">${esc(r.set)} · ${esc(r.number)}${r.rarity ? ' · ' + esc(r.rarity) : ''}</span>${extra}</span><span class="p"><b>${money(r.gbp)}</b><span class="${cls(c30)}">${pct(c30)} 7d/30d</span></span></button>`;
+  return `<button type="button" class="row" data-id="${esc(r.id)}">${r.img ? `<img src="${esc(r.img)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : '<span class="ph"></span>'}<span><span class="t">${esc(r.name)}</span><br><span class="s">${esc(r.set)} · ${esc(r.number)}${r.rarity ? ' · ' + esc(r.rarity) : ''}</span>${extra}</span><span class="p"><b>${money(r.gbp)}</b><span class="${cls(c30)}">${pct(c30)} 7d/30d</span></span></button>`;
 }
 
 function dayChange(id) {
