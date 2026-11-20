@@ -60,6 +60,7 @@ button{cursor:pointer}
 .ctrl{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;justify-content:space-between;margin:22px 0 8px}
 .tabs{display:flex;flex-wrap:wrap;gap:6px}
 .tab{min-height:38px;padding:5px 13px;border-radius:999px;border:1px solid rgba(255,255,255,.45);background:transparent;color:#fff;font-size:14px;display:inline-flex;align-items:center;gap:6px}
+.tab:disabled{opacity:.4;cursor:not-allowed}
 .tab[aria-pressed=true]{background:#fff;color:var(--red2);border-color:#fff;font-weight:600}
 .fig{position:relative;min-height:320px}.fig>svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 .fig.s{min-height:220px}.fig.xs{min-height:150px}
@@ -243,7 +244,7 @@ const dfmt = (d) => new Date(d + 'T12:00:00Z').toLocaleDateString('en-GB', { day
 const dfmtY = (d) => new Date(d + 'T12:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 const SEGS = [['all', 'All market', 'var(--c-all)', '#ff4b2b'], ['vintage', 'Vintage', 'var(--c-vintage)', '#e8a400'], ['modern', 'Modern', 'var(--c-modern)', '#8b5cf6'], ['current', 'Current era', 'var(--c-current)', '#0fb5ae'], ['blue', 'Blue chip 53', 'var(--c-blue)', '#3b82f6']];
 const SEG = Object.fromEntries(SEGS.map((s) => [s[0], s]));
-const RANGES = [['1M', 31], ['3M', 92], ['1Y', 366], ['All', 0]];
+const RANGES = [['1W', 8], ['1M', 31], ['3M', 92], ['1Y', 366], ['All', 0]];
 const REPO = 'Mrhuggies/uk-pokemon-index';
 const T = 'https://api.tcgdex.net/v2/en';
 const ls = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
@@ -288,7 +289,7 @@ function chart(box, series, o = {}) {
     let g = '';
     for (let k = 0; k <= 4; k++) { const v = lo + (hi - lo) * k / 4, yy = y(v); g += `<line x1="${pl}" x2="${W - pr}" y1="${yy}" y2="${yy}" stroke="${faint}"/><text x="${W - pr + 6}" y="${yy + 4}" fill="${ink}" font-size="12">${esc(fmt(v, true))}</text>`; }
     if (o.zero != null && o.zero > lo && o.zero < hi) g += `<line x1="${pl}" x2="${W - pr}" y1="${y(o.zero)}" y2="${y(o.zero)}" stroke="${ink}" stroke-dasharray="3 4" opacity=".6"/>`;
-    const nt = narrow ? 3 : 5;
+    const nt = Math.max(2, Math.min(narrow ? 3 : 5, Math.floor((t1 - t0) / 864e5) + 1));
     for (let k = 0; k < nt; k++) { const t = t0 + (t1 - t0) * k / (nt - 1); g += `<text x="${x(t)}" y="${H - 6}" fill="${ink}" font-size="12" text-anchor="${k === 0 ? 'start' : k === nt - 1 ? 'end' : 'middle'}">${dfmt(new Date(t).toISOString().slice(0, 10))}</text>`; }
     const firstReal = Math.min(...series.flatMap((sr) => sr.pts.filter((p) => !p[2]).map((p) => p[0])));
     if (isFinite(firstReal) && firstReal > t0) g += `<line x1="${x(firstReal)}" x2="${x(firstReal)}" y1="${pt}" y2="${H - pb}" stroke="${ink}" opacity=".25"/>`;
@@ -359,7 +360,12 @@ function renderBoard() {
   $('#chips').innerHTML = ch.filter((c) => c[1] != null).map(([k, v]) => `<span class="chip">${k}<b class="${cls(v)}">${pct(v)}</b></span>`).join('') + `<span class="chip">7d vs 30d avg<b class="${cls(m)}">${pct(m)}</b></span>`;
   const c = L?.counts; const nNow = h?.n?.[seg]?.[h.n[seg].length - 1];
   $('#stat').textContent = c ? (seg === 'blue' ? `${c.basketPriced} of ${c.basket} blue-chip cards priced` : `${N0.format(nNow || 0)} cards in this group · ${N0.format(c.priced)} cards priced in total`) : '';
-  $('#ranges').innerHTML = dates.length >= 1 ? RANGES.map(([r]) => `<button type="button" class="tab" data-r="${r}" aria-pressed="${r === range}">${r}</button>`).join('') : '';
+  // A range is only offered once the data is longer than it; otherwise it would draw the same as All.
+  const sp = dates.length ? segSeries(seg) : [];
+  const spanDays = sp.length ? (tms(sp[sp.length - 1][0]) - tms(sp[0][0])) / 864e5 : 0;
+  const usable = (d) => !d || spanDays > d;
+  if (!usable(RANGES.find((r) => r[0] === range)?.[1])) range = 'All';
+  $('#ranges').innerHTML = dates.length >= 1 ? RANGES.map(([r, d]) => usable(d) ? `<button type="button" class="tab" data-r="${r}" aria-pressed="${r === range}">${r}</button>` : `<button type="button" class="tab" disabled title="Needs more than ${d - 1} days of history">${r}</button>`).join('') : '';
   $('#modes').innerHTML = dates.length >= 1 ? [['single', 'This group'], ['compare', 'Compare groups']].map(([k, t]) => `<button type="button" class="tab" data-mode="${k}" aria-pressed="${k === mode}">${t}</button>`).join('') : '';
   const box = $('#chartbox');
   const canDraw = dates.length >= 2 || (D.history?.est && dates.length >= 1);
@@ -373,7 +379,7 @@ function renderBoard() {
       chart(box, series, { label: 'Index groups compared', fmt: (v) => pct(v, 1), zero: 0, estLabel: (i, ref) => estLabel(i, ref, anchorEst) });
     } else chart(box, [{ name, color: '#ffcc00', pts: segSeries(seg).filter((p) => tms(p[0]) >= cut) }], { label: name + ' index', estLabel: (i, ref) => estLabel(i, ref, anchorEst) });
     const hasEst = segSeries(seg).some((p) => p[2]);
-    $('#chartnote').textContent = hasEst ? `Dashed: estimated from Cardmarket's 30-day and 7-day averages, placed mid-window. Solid: the nightly index, from ${dfmt(dates[0])}.` : '';
+    $('#chartnote').textContent = (hasEst ? `Dashed: estimated from Cardmarket's 30-day and 7-day averages, placed mid-window. Solid: the nightly index, from ${dfmt(dates[0])}. ` : '') + (RANGES.some(([, d]) => d && !usable(d)) ? `The chart covers ${Math.round(spanDays)} days so far; longer ranges switch on as nightly history builds.` : '');
   } else {
     if (box._ro) box._ro.disconnect();
     box.className = 'early'; $('#chartnote').textContent = '';
