@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ['watch/**', 'lib/**', 'scripts/**']
+    paths: ["watch/**", "lib/**", "scripts/update.mjs"]
 permissions:
   contents: write
 concurrency:
@@ -14,7 +14,7 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -26,7 +26,7 @@ jobs:
         run: |
           git config user.name "price-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add public/data
+          git add public/data state
           if git diff --cached --quiet; then echo "No changes"; exit 0; fi
           git commit -m "Prices for $(TZ=Europe/London date +%F)"
           git pull --rebase origin main

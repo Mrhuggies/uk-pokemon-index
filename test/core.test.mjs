@@ -1,31 +1,51 @@
-import { runUpdate, pickPrice } from '../lib/core.js';
 import assert from 'node:assert';
-const mem = {}; const store = { read: async (n) => mem[n] ? JSON.parse(mem[n]) : null, write: async (n, o) => { mem[n] = JSON.stringify(o); } };
-const basket = [{ id: 'a-1', segment: 'vintage' }, { id: 'b-1', segment: 'modern' }, { id: 'c-1', segment: 'current' }, { id: 'bad-1', segment: 'current' }];
-let day = 0; const mult = [1, 1.1, 1.21];
-const fetchText = async () => `<Cube time='2026-11-19'><Cube currency='GBP' rate='0.85'/>`;
-const fetchJson = async (url) => {
-  const id = decodeURIComponent(url.split('/').pop());
-  if (id === 'bad-1') throw new Error('404');
-  const base = { 'a-1': 100, 'b-1': 50, 'c-1': 20, 'w-1': 10 }[id];
-  const m = id === 'c-1' ? 1 : mult[day];
-  return { id, name: id, localId: '1', set: { id: 'x', name: 'Set X' }, image: 'https://assets.tcgdex.net/en/x/x/1',
-    pricing: { cardmarket: { updated: 'x', unit: 'EUR', trend: base * m, avg1: base, avg7: base * m, avg30: base * m * 0.8 } } };
-};
-mem['watchlist.json'] = JSON.stringify({ cards: [{ id: 'w-1', variant: 'normal' }] });
-for (day = 0; day < 3; day++) {
-  const l = await runUpdate({ fetchJson, fetchText, store, basket, now: new Date(Date.UTC(2026, 10, 19 + day, 5)) });
-  if (day === 0) { assert.equal(l.failed.length, 1); assert.equal(l.records.find(r => r.id === 'a-1').gbp, 85); assert.equal(l.records.find(r => r.id === 'a-1').trend, 85); }
-}
-day = 2; // re-run the last day to ensure replacement not duplication
-await runUpdate({ fetchJson, fetchText, store, basket, now: new Date(Date.UTC(2026, 10, 21, 6)) });
-const h = JSON.parse(mem['history.json']);
-console.log(h.dates, h.idx);
-assert.deepEqual(h.dates, ['2026-11-19', '2026-11-20', '2026-11-21']);
-assert.equal(h.idx.vintage[2], 1210);
-assert.equal(h.idx.current[2], 1000);
-assert.ok(Math.abs(h.idx.all[1] - 1000 * Math.exp((2 * Math.log(1.1)) / 3)) < 0.02);
-assert.ok(h.cards['w-1'] && !('w-1' in {}));
-const L = JSON.parse(mem['latest.json']); console.log(L.momentum.all, L.counts);
+import { runUpdate, step, pickPrice, eraOf, MIN_GBP } from '../lib/core.js';
+import { makeMock, memStore } from './mock.mjs';
+
+// step(): geometric mean with clamp
+let st = step({ a: 10, b: 10 }, { a: 11, b: 12.1 }, ['a', 'b']);
+assert.ok(Math.abs(st.rel - Math.sqrt(1.1 * 1.21)) < 1e-9 && st.k === 2 && st.adv === 2);
+st = step({ a: 10 }, { a: 100 }, ['a']); assert.ok(Math.abs(st.rel - Math.exp(0.4)) < 1e-9, 'clamped');
+assert.equal(eraOf('1999-01-09'), 'vintage'); assert.equal(eraOf('2021-08-27'), 'modern'); assert.equal(eraOf('2023-09-22'), 'current');
 assert.equal(pickPrice({ 'trend-holo': 5 }).variant, 'holo');
+assert.equal(pickPrice({ trend: 2, avg7: 17, avg30: 20 }).eur, 17, 'median');
+
+const m = makeMock(); const store = memStore();
+const basket = [{ id: 'base1-1', segment: 'vintage' }, { id: 'swsh7-5', segment: 'modern' }, { id: 'nope-1', segment: 'current' }];
+const watch = { cards: [{ id: 'sv03.5-6', qty: 2, cost: 10, variant: 'normal' }] };
+const run = (d, h = 5) => { m.state.day = d; return runUpdate({ ...m, store, basket, watch, now: new Date(Date.UTC(2026, 10, 20 + d, h)) }); };
+
+let L = await run(0);
+assert.equal(L.counts.universe, 91, 'pocket set excluded, unknown basket id appended');
+assert.equal(L.counts.priced, 90);
+assert.equal(L.breadth, null);
+let H = JSON.parse(store.mem['public/data/history.json']);
+assert.deepEqual(H.idx.all, [1000]); assert.deepEqual(H.idx.blue, [1000]);
+assert.ok(L.failed.some((f) => f.id === 'nope-1'));
+assert.ok(L.records.find((r) => r.id === 'sv03.5-6').inWatch);
+const names = JSON.parse(store.mem['public/data/names.json']);
+assert.ok(names.find((n) => n[0] === 'Charizard')[1] === 9, 'names counted across non-pocket sets');
+
+L = await run(1);
+H = JSON.parse(store.mem['public/data/history.json']);
+const cur = JSON.parse(store.mem['state/prices-cur.json']), prev = JSON.parse(store.mem['state/prices-prev.json']);
+const ids = Object.keys(prev.prices).filter((id) => prev.prices[id] >= MIN_GBP);
+const exp = 1000 * step(prev.prices, cur.prices, ids).rel;
+assert.ok(Math.abs(H.idx.all[1] - exp) < 0.01, `all ${H.idx.all[1]} vs ${exp}`);
+assert.ok(L.breadth && L.breadth.adv + L.breadth.dec + L.breadth.flat === H.n.all[1]);
+assert.equal(L.movers.basis, 'day');
+const all1 = H.idx.all[1];
+
+// Same-day re-run must link from the previous day, not from itself, and not duplicate the date.
+await run(1, 9);
+H = JSON.parse(store.mem['public/data/history.json']);
+assert.deepEqual(H.dates, ['2026-11-20', '2026-11-21']);
+assert.ok(Math.abs(H.idx.all[1] - all1) < 0.01, 're-run stable');
+assert.equal(JSON.parse(store.mem['state/prices-prev.json']).date, '2026-11-20');
+
+await run(2);
+H = JSON.parse(store.mem['public/data/history.json']);
+assert.equal(H.dates.length, 3); assert.equal(H.cards['sv03.5-6'].length, 3);
+assert.ok(L.sets.length >= 2 && L.bands.length === 7);
+console.log('index', H.idx, 'breadth', H.breadth);
 console.log('ALL TESTS PASS');

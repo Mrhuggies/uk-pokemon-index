@@ -3,3 +3,4 @@ test/*.png
 test/fixture-*.json
 test/shots.py
 .vercel
+test/site-*/
