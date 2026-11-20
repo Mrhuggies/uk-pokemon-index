@@ -49,3 +49,9 @@ assert.equal(H.dates.length, 3); assert.equal(H.cards['sv03.5-6'].length, 3);
 assert.ok(L.sets.length >= 2 && L.bands.length === 7);
 console.log('index', H.idx, 'breadth', H.breadth);
 console.log('ALL TESTS PASS');
+{
+  const H2 = JSON.parse(store.mem['public/data/history.json']);
+  assert.equal(H2.est.anchor, '2026-11-20'); assert.equal(H2.est.points.all.length, 3);
+  assert.ok(H2.est.points.all.every(([o, v]) => o < 0 && v > 0));
+  console.log('est', JSON.stringify(H2.est.points.all));
+}

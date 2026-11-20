@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       query:
-        description: 'Card names, comma separated'
+        description: 'Comma separated: a name, setId:name or setId:number'
         required: true
 jobs:
   find:

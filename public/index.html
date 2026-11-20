@@ -64,6 +64,8 @@ button{cursor:pointer}
 .fig{position:relative;min-height:320px}.fig>svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 .fig.s{min-height:220px}.fig.xs{min-height:150px}
 .tip{position:absolute;pointer-events:none;background:#111;color:#fff;padding:6px 9px;border-radius:6px;font-size:13px;line-height:1.35;white-space:nowrap;transform:translate(-50%,-112%);display:none;z-index:2}
+.chartnote{font-size:13px;color:#ffe0d9;margin:6px 0 0}
+.cardnote{font-size:13px;color:var(--mute);margin:6px 0 0}
 .early{background:rgba(0,0,0,.18);border-radius:12px;padding:16px;min-height:300px}
 .early p{margin:0 0 12px;color:#ffe9e4;font-size:15px;max-width:72ch}
 .mrow{display:grid;grid-template-columns:130px minmax(0,1fr) 64px;gap:10px;align-items:center;margin:12px 0;font-size:15px}
@@ -158,6 +160,7 @@ details summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;alig
     </div>
     <div class="ctrl"><div class="tabs" id="ranges"></div><div class="tabs" id="modes"></div></div>
     <div id="chartbox"></div>
+    <p class="chartnote" id="chartnote"></p>
     <div class="tiles" id="tiles"></div>
   </div>
 </section>
@@ -212,7 +215,7 @@ details summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;alig
       <h2 style="margin-top:28px">How the index works</h2>
       <p>Every night the tracker prices every English Pokémon card on TCGdex (about 20,000, TCG Pocket excluded) using Cardmarket, Europe's main card marketplace. Each card's price is the median of its Cardmarket trend price, 7-day average and 30-day average, converted to pounds at the day's ECB euro reference rate. The median stops one jumpy figure moving a card, which matters for vintage cards where listings mix conditions.</p>
       <p>The market index covers every card worth £3 or more on the previous night, so bulk commons don't swamp it. It is chain-linked and equal-weighted: each day it moves by the geometric mean of every card's price change since the night before, with each card's move capped at roughly +49% or −33%. It started at 1,000. Vintage is sets from 1999 to 2009, Modern 2010 to 2022, and Current era 2023 on (Scarlet &amp; Violet, Mega Evolution). Blue chip is a fixed basket of 53 sought-after cards.</p>
-      <p>Until there's enough nightly history, the board shows momentum: each group's 7-day average sale price against its 30-day average. Prices are for raw, ungraded cards and include the currency effect, so a weaker pound pushes the index up. For a UK sold-price check on any card, use its eBay UK link.</p>
+      <p>Before the nightly history builds up, the dashed start of each line is an estimate: Cardmarket's 30-day, 7-day and yesterday averages for the same cards, placed at the middle of each window. The tiles show momentum: each group's 7-day average sale price against its 30-day average. Prices are for raw, ungraded cards and include the currency effect, so a weaker pound pushes the index up. For a UK sold-price check on any card, use its eBay UK link.</p>
       <p class="notes" id="notes"></p>
     </div>
   </div>
@@ -259,48 +262,78 @@ function changeOver(arr, dates, days) {
   return arr[k] ? (last / arr[k] - 1) * 100 : null;
 }
 
-// Generic line chart. series: [{name, color, pts:[[date, value]]}]; fmt formats axis/tooltip values.
+// Time-based line chart. series: [{name, color, pts:[[t, value, est]]}], t = 'YYYY-MM-DD' or ms.
+// Estimated points (est = true) draw dashed, real nightly points solid.
+const tms = (d) => typeof d === 'number' ? d : Date.parse(d + 'T12:00:00Z');
 function chart(box, series, o = {}) {
   box.innerHTML = '<svg role="img" aria-label="' + esc(o.label || 'Chart') + '"></svg><div class="tip"></div>';
   const s = box.querySelector('svg'), tip = box.querySelector('.tip');
   const fmt = o.fmt || ((v) => N1.format(v));
+  series = series.map((sr) => ({ ...sr, pts: sr.pts.filter((p) => p[1] != null).map((p) => [tms(p[0]), p[1], !!p[2]]) })).filter((sr) => sr.pts.length);
   const draw = () => {
     const W = s.clientWidth, H = s.clientHeight; if (!W || !H || !series.length) return;
-    const narrow = W < 520, pl = 2, pr = narrow ? 48 : 60, pt = 12, pb = 26;
-    const all = series.flatMap((x) => x.pts.map((p) => p[1]));
-    let lo = Math.min(...all), hi = Math.max(...all); if (lo === hi) { lo -= Math.abs(lo) * 0.02 || 1; hi += Math.abs(hi) * 0.02 || 1; }
-    const pad = (hi - lo) * 0.1; lo -= pad; hi += pad;
-    const dates = series[0].pts.map((p) => p[0]); const n = dates.length;
-    const x = (i) => pl + (n === 1 ? (W - pl - pr) / 2 : i * (W - pl - pr) / (n - 1));
+    const narrow = W < 520, pl = 2, pr = narrow ? 50 : 62, pt = 12, pb = 26;
+    const vals = series.flatMap((x) => x.pts.map((p) => p[1])), ts = series.flatMap((x) => x.pts.map((p) => p[0]));
+    let lo = Math.min(...vals), hi = Math.max(...vals); if (lo === hi) { lo -= Math.abs(lo) * 0.02 || 1; hi += Math.abs(hi) * 0.02 || 1; }
+    const pad = (hi - lo) * 0.12; lo -= pad; hi += pad;
+    let t0 = Math.min(...ts), t1 = Math.max(...ts); if (t0 === t1) { t0 -= 864e5; t1 += 864e5; }
+    const x = (t) => pl + (t - t0) / (t1 - t0) * (W - pl - pr);
     const y = (v) => pt + (hi - v) / (hi - lo) * (H - pt - pb);
     const ink = o.ink || 'rgba(255,255,255,.85)', faint = o.faint || 'rgba(255,255,255,.18)';
     let g = '';
-    for (let t = 0; t <= 4; t++) { const v = lo + (hi - lo) * t / 4, yy = y(v); g += `<line x1="${pl}" x2="${W - pr}" y1="${yy}" y2="${yy}" stroke="${faint}"/><text x="${W - pr + 6}" y="${yy + 4}" fill="${ink}" font-size="12">${esc(fmt(v, true))}</text>`; }
+    for (let k = 0; k <= 4; k++) { const v = lo + (hi - lo) * k / 4, yy = y(v); g += `<line x1="${pl}" x2="${W - pr}" y1="${yy}" y2="${yy}" stroke="${faint}"/><text x="${W - pr + 6}" y="${yy + 4}" fill="${ink}" font-size="12">${esc(fmt(v, true))}</text>`; }
     if (o.zero != null && o.zero > lo && o.zero < hi) g += `<line x1="${pl}" x2="${W - pr}" y1="${y(o.zero)}" y2="${y(o.zero)}" stroke="${ink}" stroke-dasharray="3 4" opacity=".6"/>`;
-    const lbl = narrow ? [0, n - 1] : [0, Math.round((n - 1) / 3), Math.round(2 * (n - 1) / 3), n - 1];
-    for (const i of [...new Set(lbl)]) g += `<text x="${x(i)}" y="${H - 6}" fill="${ink}" font-size="12" text-anchor="${i === 0 ? 'start' : i === n - 1 ? 'end' : 'middle'}">${dfmt(dates[i])}</text>`;
+    const nt = narrow ? 3 : 5;
+    for (let k = 0; k < nt; k++) { const t = t0 + (t1 - t0) * k / (nt - 1); g += `<text x="${x(t)}" y="${H - 6}" fill="${ink}" font-size="12" text-anchor="${k === 0 ? 'start' : k === nt - 1 ? 'end' : 'middle'}">${dfmt(new Date(t).toISOString().slice(0, 10))}</text>`; }
+    const firstReal = Math.min(...series.flatMap((sr) => sr.pts.filter((p) => !p[2]).map((p) => p[0])));
+    if (isFinite(firstReal) && firstReal > t0) g += `<line x1="${x(firstReal)}" x2="${x(firstReal)}" y1="${pt}" y2="${H - pb}" stroke="${ink}" opacity=".25"/>`;
     for (const sr of series) {
-      const d = sr.pts.map((p, i) => p[1] == null ? '' : (i && sr.pts[i - 1][1] != null ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(p[1]).toFixed(1)).join('');
-      if (series.length === 1 && o.area !== false) g += `<path d="${d}L${x(n - 1)} ${H - pb}L${x(0)} ${H - pb}Z" fill="${sr.color}" opacity=".16"/>`;
-      g += `<path class="line-anim" d="${d}" fill="none" stroke="${sr.color}" stroke-width="${series.length === 1 ? 2.8 : 2.2}" stroke-linejoin="round" stroke-linecap="round"/>`;
-      if (n < 32) g += sr.pts.map((p, i) => p[1] == null ? '' : `<circle cx="${x(i)}" cy="${y(p[1])}" r="2.6" fill="${sr.color}"/>`).join('');
-      const lp = sr.pts[n - 1]; if (lp && lp[1] != null) g += `<circle cx="${x(n - 1)}" cy="${y(lp[1])}" r="4.5" fill="${sr.color}" stroke="${o.dotRing || '#fff'}" stroke-width="2"/>`;
+      const P = sr.pts, sw = series.length === 1 ? 2.8 : 2.2;
+      if (series.length === 1 && o.area !== false) g += `<path d="M${x(P[0][0])} ${y(P[0][1])}${P.map((p) => `L${x(p[0]).toFixed(1)} ${y(p[1]).toFixed(1)}`).join('')}L${x(P[P.length - 1][0])} ${H - pb}L${x(P[0][0])} ${H - pb}Z" fill="${sr.color}" opacity=".15"/>`;
+      let dE = '', dR = '';
+      for (let i = 1; i < P.length; i++) { const seg = `M${x(P[i - 1][0]).toFixed(1)} ${y(P[i - 1][1]).toFixed(1)}L${x(P[i][0]).toFixed(1)} ${y(P[i][1]).toFixed(1)}`; if (P[i - 1][2] || P[i][2]) dE += seg; else dR += seg; }
+      if (dE) g += `<path d="${dE}" fill="none" stroke="${sr.color}" stroke-width="${sw}" stroke-dasharray="5 5" stroke-linecap="round" opacity=".9"/>`;
+      if (dR) g += `<path class="line-anim" d="${dR}" fill="none" stroke="${sr.color}" stroke-width="${sw}" stroke-linejoin="round" stroke-linecap="round"/>`;
+      if (P.length < 40) g += P.map((p) => `<circle cx="${x(p[0])}" cy="${y(p[1])}" r="${p[2] ? 3 : 2.8}" fill="${p[2] ? 'none' : sr.color}" stroke="${sr.color}" stroke-width="1.6"/>`).join('');
+      const lp = P[P.length - 1]; g += `<circle cx="${x(lp[0])}" cy="${y(lp[1])}" r="4.5" fill="${sr.color}" stroke="${o.dotRing || '#fff'}" stroke-width="2"/>`;
     }
     g += `<line id="cur" y1="${pt}" y2="${H - pb}" stroke="${ink}" opacity=".5" style="display:none"/>`;
     s.innerHTML = g;
-    const cur = s.querySelector('#cur');
+    const cur = s.querySelector('#cur'); const ref = series[0].pts;
     const move = (ev) => {
       const r = s.getBoundingClientRect(); const cx = (ev.touches ? ev.touches[0].clientX : ev.clientX) - r.left;
-      const i = Math.max(0, Math.min(n - 1, Math.round((cx - pl) / ((W - pl - pr) / Math.max(1, n - 1)))));
-      cur.setAttribute('x1', x(i)); cur.setAttribute('x2', x(i)); cur.style.display = '';
-      const top = Math.min(...series.map((sr) => sr.pts[i][1] == null ? H : y(sr.pts[i][1])));
-      tip.style.display = 'block'; tip.style.left = Math.max(70, Math.min(W - 70, x(i))) + 'px'; tip.style.top = top + 'px';
-      tip.innerHTML = `<b>${dfmtY(dates[i])}</b>` + series.map((sr) => `<br><span style="color:${sr.color}">●</span> ${esc(sr.name)} ${sr.pts[i][1] == null ? '—' : esc(fmt(sr.pts[i][1]))}`).join('');
+      const t = t0 + (cx - pl) / (W - pl - pr) * (t1 - t0);
+      let i = 0; for (let k = 1; k < ref.length; k++) if (Math.abs(ref[k][0] - t) < Math.abs(ref[i][0] - t)) i = k;
+      const tt = ref[i][0]; cur.setAttribute('x1', x(tt)); cur.setAttribute('x2', x(tt)); cur.style.display = '';
+      const at = series.map((sr) => sr.pts.find((p) => p[0] === tt));
+      const top = Math.min(...at.filter(Boolean).map((p) => y(p[1])));
+      tip.style.display = 'block'; tip.style.left = Math.max(80, Math.min(W - 80, x(tt))) + 'px'; tip.style.top = top + 'px';
+      const label = ref[i][2] ? (o.estLabel?.(i, ref) || 'Estimate') : dfmtY(new Date(tt).toISOString().slice(0, 10));
+      tip.innerHTML = `<b>${esc(label)}</b>` + series.map((sr, k) => `<br><span style="color:${sr.color}">●</span> ${esc(sr.name)} ${at[k] ? esc(fmt(at[k][1])) : '—'}`).join('');
     };
     s.onpointermove = move; s.onpointerdown = move; s.onpointerleave = () => { tip.style.display = 'none'; cur.style.display = 'none'; };
   };
   if (box._ro) box._ro.disconnect();
   box._ro = new ResizeObserver(draw); box._ro.observe(s);
+}
+const EST_NAMES = { '-15': '≈ 30-day average', '-3.5': '≈ 7-day average', '-1': '≈ yesterday’s average' };
+const estLabel = (i, ref, anchor) => { const off = Math.round((ref[i][0] - tms(anchor)) / 864e5 * 2) / 2; return (EST_NAMES[String(off)] || 'Estimate') + ' (Cardmarket)'; };
+const addDays = (d, n) => tms(d) + n * 864e5;
+// Market series for a group: back-estimate points (dashed) then nightly index (solid).
+function segSeries(key) {
+  const h = D.history, out = [];
+  const est = h.est; if (est && est.points?.[key]) for (const [off, v] of est.points[key]) if (v != null && addDays(est.anchor, off) < tms(h.dates[0])) out.push([addDays(est.anchor, off), v, true]);
+  h.dates.forEach((d, i) => out.push([d, h.idx[key][i], false]));
+  return out;
+}
+// Card series: Cardmarket averages before the card's first nightly price, then nightly prices.
+function cardSeries(r) {
+  const anchor = D.latest?.date || new Date().toISOString().slice(0, 10);
+  const hist = D.history?.cards?.[r.id]; const real = hist ? D.history.dates.map((d, i) => [d, hist[i], false]).filter((p) => p[1] != null) : [];
+  const first = real.length ? tms(real[0][0]) : Infinity;
+  const est = [[-15, r.avg30], [-3.5, r.avg7], [-1, r.avg1]].filter(([off, v]) => v != null && addDays(anchor, off) < first).map(([off, v]) => [addDays(anchor, off), v, true]);
+  if (!real.length && r.gbp != null) real.push([anchor, r.gbp, false]);
+  return est.concat(real);
 }
 
 function spark(vals, color) {
@@ -321,21 +354,26 @@ function renderBoard() {
   $('#chips').innerHTML = ch.filter((c) => c[1] != null).map(([k, v]) => `<span class="chip">${k}<b class="${cls(v)}">${pct(v)}</b></span>`).join('') + `<span class="chip">7d vs 30d avg<b class="${cls(m)}">${pct(m)}</b></span>`;
   const c = L?.counts; const nNow = h?.n?.[seg]?.[h.n[seg].length - 1];
   $('#stat').textContent = c ? (seg === 'blue' ? `${c.basketPriced} of ${c.basket} blue-chip cards priced` : `${N0.format(nNow || 0)} cards in this group · ${N0.format(c.priced)} cards priced in total`) : '';
-  $('#ranges').innerHTML = dates.length >= 2 ? RANGES.map(([r]) => `<button type="button" class="tab" data-r="${r}" aria-pressed="${r === range}">${r}</button>`).join('') : '';
-  $('#modes').innerHTML = dates.length >= 2 ? [['single', 'This group'], ['compare', 'Compare groups']].map(([k, t]) => `<button type="button" class="tab" data-mode="${k}" aria-pressed="${k === mode}">${t}</button>`).join('') : '';
+  $('#ranges').innerHTML = dates.length >= 1 ? RANGES.map(([r]) => `<button type="button" class="tab" data-r="${r}" aria-pressed="${r === range}">${r}</button>`).join('') : '';
+  $('#modes').innerHTML = dates.length >= 1 ? [['single', 'This group'], ['compare', 'Compare groups']].map(([k, t]) => `<button type="button" class="tab" data-mode="${k}" aria-pressed="${k === mode}">${t}</button>`).join('') : '';
   const box = $('#chartbox');
-  if (dates.length >= 2) {
+  const canDraw = dates.length >= 2 || (D.history?.est && dates.length >= 1);
+  if (canDraw) {
     box.className = 'fig';
-    const k = cutoffIdx(dates), ds = dates.slice(k);
+    const days = RANGES.find((r) => r[0] === range)[1];
+    const cut = days ? tms(dates[dates.length - 1]) - days * 864e5 : -Infinity;
+    const anchorEst = D.history?.est?.anchor || dates[0];
     if (mode === 'compare') {
-      const series = SEGS.map(([key, nm, , col]) => { const a = h.idx[key].slice(k); const b = a.find((v) => v != null); return { name: nm, color: col, pts: ds.map((d, i) => [d, a[i] == null || !b ? null : (a[i] / b - 1) * 100]) }; });
-      chart(box, series, { label: 'Index groups compared', fmt: (v) => pct(v, 1), zero: 0 });
-    } else chart(box, [{ name, color: '#ffcc00', pts: ds.map((d, i) => [d, arr[k + i]]) }], { label: name + ' index' });
+      const series = SEGS.map(([key, nm, , col]) => { const pts = segSeries(key).filter((p) => tms(p[0]) >= cut); const b = pts[0]?.[1]; return { name: nm, color: col, pts: pts.map((p) => [p[0], b ? (p[1] / b - 1) * 100 : null, p[2]]) }; });
+      chart(box, series, { label: 'Index groups compared', fmt: (v) => pct(v, 1), zero: 0, estLabel: (i, ref) => estLabel(i, ref, anchorEst) });
+    } else chart(box, [{ name, color: '#ffcc00', pts: segSeries(seg).filter((p) => tms(p[0]) >= cut) }], { label: name + ' index', estLabel: (i, ref) => estLabel(i, ref, anchorEst) });
+    const hasEst = segSeries(seg).some((p) => p[2]);
+    $('#chartnote').textContent = hasEst ? `Dashed: estimated from Cardmarket's 30-day, 7-day and yesterday averages. Solid: the nightly index, from ${dfmt(dates[0])}.` : '';
   } else {
     if (box._ro) box._ro.disconnect();
-    box.className = 'early';
+    box.className = 'early'; $('#chartnote').textContent = '';
     const rows = SEGS.map(([k, n, , col]) => { const v = L?.momentum?.[k]?.vs30; const w = v == null ? 0 : Math.min(50, Math.abs(v) / 20 * 50); return `<div class="mrow"><span><span class="dot" style="background:${col}"></span> ${n}</span><div class="mbar"><i style="${v >= 0 ? 'left:50%' : 'right:50%'};width:${w}%;background:${col}"></i><span class="mid"></span></div><b class="num ${cls(v)}" style="text-align:right">${pct(v)}</b></div>`; }).join('');
-    box.innerHTML = `<p>The nightly history started ${dates[0] ? dfmt(dates[0]) : 'today'}, so the index chart draws from the second night. Until then, this is momentum: each group's 7-day average sale price against its 30-day average (bars end at ±20%).</p>${rows}`;
+    box.innerHTML = `<p>The index chart draws after the first nightly update. Until then, this is momentum: each group's 7-day average sale price against its 30-day average (bars end at ±20%).</p>${rows}`;
   }
   $('#tiles').innerHTML = SEGS.map(([k, n, , col]) => { const a = h?.idx?.[k] || []; const cd = changeOver(a, dates, 1); const mm = L?.momentum?.[k]?.vs30;
     return `<button type="button" class="tile" style="--c:${col}" data-seg="${k}" aria-pressed="${k === seg}"><small>${n}</small><span class="n num">${a.length ? N1.format(a[a.length - 1]) : '—'}</span><small>${cd != null ? `<span class="${cls(cd)}">${pct(cd)}</span> today · ` : ''}<span class="${cls(mm)}">${pct(mm)}</span> 7d/30d</small></button>`; }).join('');
@@ -406,7 +444,11 @@ function renderWatch() {
   $('#watch').innerHTML = rows.length ? rows.join('') : '<p class="empty">No cards yet. Find a card, open it and tap Add card. It opens GitHub with the file ready; commit it and the card is priced at the next run (about ten minutes), then every night.</p>';
   $('#totals').innerHTML = w.length ? `<span>Value<b>${money(val)}</b></span>${hasCost ? `<span>Paid<b>${money(cost)}</b></span><span>Gain<b class="${cls(val - cost)}">${money(val - cost)}</b></span>` : ''}` : '';
   const pts = (h?.dates || []).map((d, i) => { let t = 0, any = false; for (const e of w) { const v = h.cards[e.id]?.[i]; if (v != null) { t += v * (e.qty || 1); any = true; } } return [d, any ? Math.round(t * 100) / 100 : null]; }).filter((p) => p[1] != null);
-  if (w.length && pts.length >= 2) { $('#pfchart').className = 'fig s light'; chart($('#pfchart'), [{ name: 'My cards', color: '#c8270f', pts }], { fmt: (v) => money(v), ink: 'currentColor', faint: 'rgba(128,128,128,.22)', dotRing: 'transparent', label: 'Value of my cards over time' }); }
+  if (pts.length && D.latest) { // back-estimate from each card's Cardmarket averages
+    const est = [[-15, 'avg30'], [-3.5, 'avg7'], [-1, 'avg1']].map(([off, k]) => { let t = 0, ok = true; for (const e of w) { const r = recs[e.id]; if (!r?.[k]) { ok = false; break; } t += r[k] * (e.qty || 1); } return ok ? [addDays(D.latest.date, off), Math.round(t * 100) / 100, true] : null; }).filter((p) => p && p[0] < tms(pts[0][0]));
+    pts.unshift(...est);
+  }
+  if (w.length && pts.length >= 2) { $('#pfchart').className = 'fig s light'; chart($('#pfchart'), [{ name: 'My cards', color: '#c8270f', pts }], { fmt: (v) => money(v), ink: 'currentColor', faint: 'rgba(128,128,128,.22)', dotRing: 'transparent', label: 'Value of my cards over time', estLabel: (i, ref) => estLabel(i, ref, D.latest.date) }); }
   else { $('#pfchart').className = ''; $('#pfchart').innerHTML = ''; }
 }
 
@@ -434,21 +476,20 @@ function openCard(id) {
   const r = recs[id]; if (!r) return;
   const w = D.watchlist.cards.find((c) => c.id === id);
   const q = encodeURIComponent(`${r.name} ${r.set || ''} ${r.number || ''}`.trim());
-  const hist = D.history?.cards?.[id];
-  const pts = hist ? D.history.dates.map((d, i) => [d, hist[i]]).filter((p) => p[1] != null) : [];
+  const pts = cardSeries(r); const nReal = pts.filter((p) => !p[2]).length;
   const lad = [['30-day avg', r.avg30], ['7-day avg', r.avg7], ['Yesterday', r.avg1], ['Trend', r.trend], ['Our price', r.gbp]].filter((x) => x[1] != null);
   const mx = Math.max(...lad.map((x) => x[1]), 1), mn = Math.min(...lad.map((x) => x[1])) * 0.8;
   $('#panel').innerHTML = `<div class="dhead"><button type="button" class="btn" id="close">Close</button></div>
     <div class="ph2"><span class="holo">${r.img ? `<img src="${esc(r.img.replace('/low.webp', '/high.webp'))}" alt="${esc(r.name)}">` : ''}</span><div><h2>${esc(r.name)}</h2><p class="sub">${esc(r.set || '')}${r.number ? ' · ' + esc(r.number) : ''}${r.rarity ? ' · ' + esc(r.rarity) : ''}</p><div class="big num" style="font-size:52px">${money(r.gbp)}</div><p class="notes">Median of Cardmarket's trend, 7-day and 30-day prices${r.eur ? ` (€${Number(r.eur).toFixed(2)})` : ''}.</p></div></div>
     <h3 style="margin-top:18px">Price ladder</h3><div class="ladder">${lad.map(([k, v]) => `<div class="hbar"><span>${k}</span><span class="tr"><i style="width:${Math.max(4, (v - mn) / (mx - mn) * 100)}%;background:${k === 'Our price' ? 'var(--red)' : 'var(--c-blue)'}"></i></span><span class="v">${money(v)}</span></div>`).join('')}</div>
-    ${pts.length >= 2 ? '<h3 style="margin-top:16px">Nightly history</h3><div class="fig s light" id="cfig"></div>' : '<p class="notes">A nightly price line appears once this card has two nights of prices; add it to your cards to track it.</p>'}
+    ${pts.length >= 2 ? `<h3 style="margin-top:16px">Price over time</h3><div class="fig s light" id="cfig"></div><p class="cardnote">${pts.some((p) => p[2]) ? `Dashed: Cardmarket's 30-day, 7-day and yesterday averages. Solid: ${nReal > 1 ? 'nightly prices' : 'today'}.` : 'Nightly prices.'}${!D.history?.cards?.[id] ? ' Add it to your cards to build a nightly line.' : ''}</p>` : ''}
     <div class="links"><a href="https://www.ebay.co.uk/sch/i.html?_nkw=${q}&LH_Sold=1&LH_Complete=1" target="_blank" rel="noopener">eBay UK sold</a><a href="https://www.cardmarket.com/en/Pokemon/Products/Search?searchString=${encodeURIComponent(r.name)}" target="_blank" rel="noopener">Cardmarket</a></div>
     <h3>${w ? 'In my cards' : 'Add to my cards'}</h3>
     ${w ? `<p class="notes">${w.qty || 1} owned${w.cost != null ? ', paid ' + money(w.cost) + ' each' : ''}.</p>` : ''}
     <form class="form" id="wform"><div><label for="fq">Quantity</label><input id="fq" inputmode="numeric" value="${w?.qty ?? ''}" placeholder="1"></div><div><label for="fc">Paid each (£)</label><input id="fc" inputmode="decimal" value="${w?.cost ?? ''}" placeholder="optional"></div><div><label for="fv">Price type</label><select id="fv"><option value="normal">Standard</option><option value="holo" ${w?.variant === 'holo' ? 'selected' : ''}>Reverse holo</option></select></div>
     <button class="btn pri" type="submit">${w ? 'Edit on GitHub' : 'Add card'}</button>${w ? `<a class="btn" style="display:inline-flex;align-items:center;justify-content:center;text-decoration:none" target="_blank" rel="noopener" href="${gh('delete', id)}">Remove</a>` : ''}</form><p class="notes">Opens GitHub with the card's file ready. Commit it and the next price run picks it up.</p>`;
   $('#dr').classList.add('open');
-  if (pts.length >= 2) chart($('#cfig'), [{ name: r.name, color: '#c8270f', pts }], { fmt: (v) => money(v), ink: 'currentColor', faint: 'rgba(128,128,128,.22)', dotRing: 'transparent', label: r.name + ' price history' });
+  if (pts.length >= 2) chart($('#cfig'), [{ name: r.name, color: '#c8270f', pts }], { fmt: (v) => money(v), ink: 'currentColor', faint: 'rgba(128,128,128,.22)', dotRing: 'transparent', label: r.name + ' price over time', estLabel: (i, ref) => estLabel(i, ref, D.latest?.date || new Date().toISOString().slice(0, 10)) });
   $('#close').onclick = closeCard; $('#close').focus();
   $('#wform').onsubmit = (e) => { e.preventDefault(); const n = (v) => v.trim() === '' || isNaN(+v) ? undefined : +v;
     const body = JSON.stringify({ qty: n($('#fq').value), cost: n($('#fc').value), variant: $('#fv').value === 'holo' ? 'holo' : undefined }, null, 2);
