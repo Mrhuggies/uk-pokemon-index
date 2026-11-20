@@ -151,13 +151,13 @@ details summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;alig
 <section class="band" style="padding-top:0">
   <div class="wrap">
     <details><summary><span>Index constituents (<span id="ccount">0</span> cards)</span></summary>
-      <div class="scroll"><table><thead><tr><th>Card</th><th class="hide-s">Segment</th><th class="r">Price</th><th class="r">vs 7d avg</th><th class="r">vs 30d avg</th></tr></thead><tbody id="ctable"></tbody></table></div>
+      <div class="scroll"><table><thead><tr><th>Card</th><th class="hide-s">Segment</th><th class="r">Price</th><th class="r">Trend</th><th class="r">7d vs 30d</th></tr></thead><tbody id="ctable"></tbody></table></div>
     </details>
     <div class="method">
       <h2 style="margin-top:28px">How the index works</h2>
-      <p>Prices come from Cardmarket, Europe's main card marketplace, through the free TCGdex API. Each night the tracker takes every card's Cardmarket trend price (falling back to its 30-day average), converts it to pounds at the day's ECB euro reference rate, and stores it.</p>
+      <p>Prices come from Cardmarket, Europe's main card marketplace, through the free TCGdex API. Each night the tracker takes the median of every card's Cardmarket trend price, 7-day average and 30-day average (the median stops one jumpy figure moving a card, which matters for vintage cards where listings mix conditions), converts it to pounds at the day's ECB euro reference rate, and stores it.</p>
       <p>The index is chain-linked and equal-weighted: each day it moves by the geometric mean of every card's price change since the day before, so a £20 card counts as much as a £2,000 one. Each card's single-day move is capped at roughly +49% or −33% to stop thin listings swinging the index. It started at 1,000 on its first day, and the sub-indices split cards into Vintage (1999 to 2009), Modern (2010 to 2022) and Scarlet &amp; Violet (2023 on).</p>
-      <p>Until there's enough nightly history, the board shows momentum: how today's prices compare with Cardmarket's own 7 and 30-day averages. Prices are for raw, ungraded cards and include the currency effect, so a weaker pound pushes the index up. For a UK sold-price check on any card, use its eBay UK link.</p>
+      <p>Until there's enough nightly history, the board shows momentum: each group's 7-day average sale price against its 30-day average. Prices are for raw, ungraded cards and include the currency effect, so a weaker pound pushes the index up. For a UK sold-price check on any card, use its eBay UK link.</p>
       <p class="notes" id="notes"></p>
     </div>
   </div>
@@ -240,7 +240,7 @@ function renderBoard() {
   const m = L?.momentum?.[seg] || {};
   const ch = [['1 day', changeOver(arr, dates, 1)], ['7 days', changeOver(arr, dates, 7)], ['30 days', changeOver(arr, dates, 30)]];
   $('#chips').innerHTML = ch.filter((c) => c[1] != null).map(([k, v]) => `<span class="chip">${k}<b class="${cls(v)}">${pct(v)}</b></span>`).join('') +
-    `<span class="chip">vs 30-day avg<b class="${cls(m.vs30)}">${pct(m.vs30)}</b></span>`;
+    `<span class="chip">7d vs 30d avg<b class="${cls(m.vs30)}">${pct(m.vs30)}</b></span>`;
   $('#ranges').innerHTML = RANGES.map(([r]) => `<button type="button" class="tab" data-r="${r}" aria-pressed="${r === range}">${r}</button>`).join('');
   const box = $('#chartbox');
   const pts = series(arr, dates);
@@ -251,15 +251,15 @@ function renderBoard() {
     box.className = 'early';
     const rows = SEGS.map(([k, n]) => { const v = L?.momentum?.[k]?.vs30; const w = v == null ? 0 : Math.min(50, Math.abs(v) / 20 * 50); return `<div class="mrow"><span>${n}</span><div class="mbar"><i style="${v >= 0 ? 'left:50%' : 'right:50%'};width:${w}%"></i><span class="mid"></span></div><b class="num ${cls(v)}" style="text-align:right">${pct(v)}</b></div>`; }).join('');
     $('#ranges').innerHTML = '';
-    box.innerHTML = `<p>The nightly history started ${dates[0] ? dfmt(dates[0]) : 'today'}, so the chart fills in as each night is added. For now, here's how today's prices compare with Cardmarket's own 30-day averages (bar ends at ±20%):</p>${rows}`;
+    box.innerHTML = `<p>The nightly history started ${dates[0] ? dfmt(dates[0]) : 'today'}, so the chart fills in as each night is added. For now, this is momentum: Cardmarket's 7-day average sale price against its 30-day average, across each group (bar ends at ±20%):</p>${rows}`;
   }
   $('#tiles').innerHTML = SEGS.map(([k, n]) => { const a = h?.idx?.[k] || []; const c = changeOver(a, dates, 1); const mm = L?.momentum?.[k]?.vs30; const cnt = (L?.records || []).filter((r) => r.inIndex && r.gbp != null && (k === 'all' || r.segment === k)).length;
-    return `<button type="button" class="tile" data-seg="${k}" aria-pressed="${k === seg}"><small>${n}</small><span class="n num">${a.length ? N.format(a[a.length - 1]) : '—'}</span><small>${c != null ? `<span class="${cls(c)}">${pct(c)}</span> today · ` : ''}${pct(mm)} vs 30d · ${cnt} cards</small></button>`; }).join('');
+    return `<button type="button" class="tile" data-seg="${k}" aria-pressed="${k === seg}"><small>${n}</small><span class="n num">${a.length ? N.format(a[a.length - 1]) : '—'}</span><small>${c != null ? `<span class="${cls(c)}">${pct(c)}</span> today · ` : ''}${pct(mm)} 7d vs 30d · ${cnt} cards</small></button>`; }).join('');
 }
 
 function cardRow(r, extra = '') {
-  const c30 = r.gbp && r.avg30 ? (r.gbp / r.avg30 - 1) * 100 : null;
-  return `<button type="button" class="row" data-id="${esc(r.id)}">${r.img ? `<img src="${esc(r.img)}" alt="" loading="lazy">` : '<span class="ph"></span>'}<span><span class="t">${esc(r.name)}</span><br><span class="s">${esc(r.set)} · ${esc(r.number)}${r.rarity ? ' · ' + esc(r.rarity) : ''}</span>${extra}</span><span class="p"><b>${money(r.gbp)}</b><span class="${cls(c30)}">${pct(c30)} vs 30d</span></span></button>`;
+  const c30 = r.avg7 && r.avg30 ? (r.avg7 / r.avg30 - 1) * 100 : null;
+  return `<button type="button" class="row" data-id="${esc(r.id)}">${r.img ? `<img src="${esc(r.img)}" alt="" loading="lazy">` : '<span class="ph"></span>'}<span><span class="t">${esc(r.name)}</span><br><span class="s">${esc(r.set)} · ${esc(r.number)}${r.rarity ? ' · ' + esc(r.rarity) : ''}</span>${extra}</span><span class="p"><b>${money(r.gbp)}</b><span class="${cls(c30)}">${pct(c30)} 7d/30d</span></span></button>`;
 }
 
 function dayChange(id) {
@@ -287,16 +287,16 @@ function renderWatch() {
 function renderMovers() {
   const idx = (D.latest?.records || []).filter((r) => r.inIndex && r.gbp != null);
   const hasHist = (D.history?.dates?.length || 0) >= 2;
-  const scored = idx.map((r) => ({ r, v: hasHist ? dayChange(r.id) : (r.avg30 ? (r.gbp / r.avg30 - 1) * 100 : null) })).filter((x) => x.v != null);
+  const scored = idx.map((r) => ({ r, v: hasHist ? dayChange(r.id) : (r.avg7 && r.avg30 ? (r.avg7 / r.avg30 - 1) * 100 : null) })).filter((x) => x.v != null);
   scored.sort((a, b) => b.v - a.v);
-  $('#movsub').textContent = hasHist ? 'Index cards ranked by their change since the previous night.' : 'Index cards ranked by today\'s price against their Cardmarket 30-day average, until nightly history builds up.';
+  $('#movsub').textContent = hasHist ? 'Index cards ranked by their change since the previous night.' : 'Index cards ranked by their 7-day average sale price against their 30-day average, until nightly history builds up.';
   const row = (x) => cardRow(x.r);
   $('#rise').innerHTML = scored.filter((x) => x.v > 0).slice(0, 5).map(row).join('') || '<p class="empty">Nothing rising.</p>';
   $('#fall').innerHTML = scored.filter((x) => x.v < 0).slice(-5).reverse().map(row).join('') || '<p class="empty">Nothing falling.</p>';
   $('#ccount').textContent = idx.length;
   const segn = Object.fromEntries(SEGS);
-  $('#ctable').innerHTML = idx.slice().sort((a, b) => b.gbp - a.gbp).map((r) => { const a7 = r.avg7 ? (r.gbp / r.avg7 - 1) * 100 : null, a30 = r.avg30 ? (r.gbp / r.avg30 - 1) * 100 : null;
-    return `<tr><td><a href="#" data-id="${esc(r.id)}">${esc(r.name)}</a><br><span class="notes">${esc(r.set)} ${esc(r.number)}</span></td><td class="hide-s">${segn[r.segment] || ''}</td><td class="r">${money(r.gbp)}</td><td class="r ${cls(a7)}">${pct(a7)}</td><td class="r ${cls(a30)}">${pct(a30)}</td></tr>`; }).join('');
+  $('#ctable').innerHTML = idx.slice().sort((a, b) => b.gbp - a.gbp).map((r) => { const a30 = r.avg7 && r.avg30 ? (r.avg7 / r.avg30 - 1) * 100 : null;
+    return `<tr><td><a href="#" data-id="${esc(r.id)}">${esc(r.name)}</a><br><span class="notes">${esc(r.set)} ${esc(r.number)}</span></td><td class="hide-s">${segn[r.segment] || ''}</td><td class="r">${money(r.gbp)}</td><td class="r">${money(r.trend)}</td><td class="r ${cls(a30)}">${pct(a30)}</td></tr>`; }).join('');
   const L = D.latest;
   $('#notes').innerHTML = L ? `Last update ${new Date(L.generatedAt).toLocaleString('en-GB', { timeZone: 'Europe/London', dateStyle: 'medium', timeStyle: 'short' })} UK time. Exchange rate €1 = £${L.fx.rate.toFixed(4)} (${esc(L.fx.source)}, ${esc(L.fx.date || '')}). ${L.counts.priced} of ${L.counts.basket} index cards priced.${L.failed.length ? ' Not priced: ' + L.failed.map((f) => esc(f.id) + ' (' + esc(f.reason) + ')').join(', ') + '.' : ''}` : '';
 }
@@ -308,8 +308,8 @@ function openCard(id) {
   const hist = D.history?.cards?.[id];
   const pts = hist ? D.history.dates.map((d, i) => [d, hist[i]]).filter((p) => p[1] != null) : [];
   $('#panel').innerHTML = `<div class="head"><span></span><button type="button" class="btn" id="close">Close</button></div>
-    <div class="ph2">${r.img ? `<img src="${esc(r.img.replace('/low.webp', '/high.webp'))}" alt="${esc(r.name)}">` : '<span class="ph"></span>'}<div><h2>${esc(r.name)}</h2><p class="sub">${esc(r.set)} · ${esc(r.number)}${r.rarity ? ' · ' + esc(r.rarity) : ''}</p><div class="big num" style="font-size:48px">${money(r.gbp)}</div><p class="notes">Cardmarket ${r.variant === 'holo' ? 'reverse holo' : 'trend'} price${r.eur ? ` (€${r.eur.toFixed(2)})` : ''}</p></div></div>
-    <div class="stats"><div><small>From</small><b>${money(r.low)}</b></div><div><small>7-day avg</small><b>${money(r.avg7)}</b></div><div><small>30-day avg</small><b>${money(r.avg30)}</b></div></div>
+    <div class="ph2">${r.img ? `<img src="${esc(r.img.replace('/low.webp', '/high.webp'))}" alt="${esc(r.name)}">` : '<span class="ph"></span>'}<div><h2>${esc(r.name)}</h2><p class="sub">${esc(r.set)} · ${esc(r.number)}${r.rarity ? ' · ' + esc(r.rarity) : ''}</p><div class="big num" style="font-size:48px">${money(r.gbp)}</div><p class="notes">Cardmarket ${r.variant === 'holo' ? 'reverse holo ' : ''}price, median of trend and averages${r.eur ? ` (€${r.eur.toFixed(2)})` : ''}</p></div></div>
+    <div class="stats"><div><small>Trend</small><b>${money(r.trend)}</b></div><div><small>7-day avg</small><b>${money(r.avg7)}</b></div><div><small>30-day avg</small><b>${money(r.avg30)}</b></div></div>
     ${pts.length >= 2 ? '<h3>Nightly history</h3><div class="fig small" id="cfig"></div>' : '<p class="notes">Nightly history appears here once this card has two nights of prices.</p>'}
     <div class="links"><a href="https://www.ebay.co.uk/sch/i.html?_nkw=${q}&LH_Sold=1&LH_Complete=1" target="_blank" rel="noopener">eBay UK sold</a><a href="https://www.cardmarket.com/en/Pokemon/Products/Search?searchString=${encodeURIComponent(r.name)}" target="_blank" rel="noopener">Cardmarket</a></div>
     <h3>${w ? 'In my cards' : 'Add to my cards'}</h3>
@@ -337,8 +337,8 @@ async function searchDirect(q, fx) {
   const briefs = await (await fetch(`${T}/cards?${p}`)).json();
   const cards = await Promise.all((briefs || []).slice(0, 18).map((b) => fetch(`${T}/cards/${encodeURIComponent(b.id)}`).then((r) => r.ok ? r.json() : null).catch(() => null)));
   const r2 = (v) => v > 0 ? Math.round(v * fx * 100) / 100 : null;
-  return cards.filter(Boolean).map((c) => { const cm = c.pricing?.cardmarket || {}; const pick = (k) => cm[k] > 0 ? cm[k] : cm[k + '-holo'] > 0 ? cm[k + '-holo'] : null; const eur = pick('trend') ?? pick('avg30') ?? pick('avg');
-    return { id: c.id, name: c.name, set: c.set?.name || '', number: c.localId, rarity: c.rarity || '', img: c.image ? c.image + '/low.webp' : null, eur, gbp: r2(eur), low: r2(pick('low')), avg7: r2(pick('avg7')), avg30: r2(pick('avg30')), variant: 'normal' }; })
+  return cards.filter(Boolean).map((c) => { const cm = c.pricing?.cardmarket || {}; const pick = (k) => cm[k] > 0 ? cm[k] : cm[k + '-holo'] > 0 ? cm[k + '-holo'] : null; const xs = [pick('trend'), pick('avg7'), pick('avg30')].filter(Boolean).sort((a, b) => a - b); const eur = xs.length === 3 ? xs[1] : xs.length === 2 ? (xs[0] + xs[1]) / 2 : xs[0] ?? pick('avg');
+    return { id: c.id, name: c.name, set: c.set?.name || '', number: c.localId, rarity: c.rarity || '', img: c.image ? c.image + '/low.webp' : null, eur, gbp: r2(eur), trend: r2(pick('trend')), low: r2(pick('low')), avg7: r2(pick('avg7')), avg30: r2(pick('avg30')), variant: 'normal' }; })
     .sort((a, b) => (b.gbp ?? -1) - (a.gbp ?? -1));
 }
 

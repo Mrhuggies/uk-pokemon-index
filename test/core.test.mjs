@@ -10,12 +10,12 @@ const fetchJson = async (url) => {
   const base = { 'a-1': 100, 'b-1': 50, 'c-1': 20, 'w-1': 10 }[id];
   const m = id === 'c-1' ? 1 : mult[day];
   return { id, name: id, localId: '1', set: { id: 'x', name: 'Set X' }, image: 'https://assets.tcgdex.net/en/x/x/1',
-    pricing: { cardmarket: { updated: 'x', unit: 'EUR', trend: base * m, avg1: base, avg7: base, avg30: base * 0.8 } } };
+    pricing: { cardmarket: { updated: 'x', unit: 'EUR', trend: base * m, avg1: base, avg7: base * m, avg30: base * m * 0.8 } } };
 };
 mem['watchlist.json'] = JSON.stringify({ cards: [{ id: 'w-1', variant: 'normal' }] });
 for (day = 0; day < 3; day++) {
   const l = await runUpdate({ fetchJson, fetchText, store, basket, now: new Date(Date.UTC(2026, 10, 19 + day, 5)) });
-  if (day === 0) { assert.equal(l.failed.length, 1); assert.equal(l.records.find(r => r.id === 'a-1').gbp, 85); }
+  if (day === 0) { assert.equal(l.failed.length, 1); assert.equal(l.records.find(r => r.id === 'a-1').gbp, 85); assert.equal(l.records.find(r => r.id === 'a-1').trend, 85); }
 }
 day = 2; // re-run the last day to ensure replacement not duplication
 await runUpdate({ fetchJson, fetchText, store, basket, now: new Date(Date.UTC(2026, 10, 21, 6)) });

@@ -1,0 +1,16 @@
+name: Find card ids
+on:
+  workflow_dispatch:
+    inputs:
+      query:
+        description: 'Card names, comma separated'
+        required: true
+jobs:
+  find:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: node scripts/find.mjs "$Q"
+        env: { Q: '${{ inputs.query }}' }
