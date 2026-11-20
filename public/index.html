@@ -4,76 +4,119 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>UK Pokémon Card Index</title>
-<meta name="theme-color" content="#d42a12">
+<meta name="theme-color" content="#c8270f">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-/* VOICE: a trading desk's daily sheet for card collectors: brisk, numeric, trustworthy.
-   IDEA: the price board above a card shop counter, with a graded-slab label for each card.
-   PICTURE: the index line, large, on the red board; cards as slab-style rows below.
-   COLOUR and TYPE: shop-sign red board, white sheet, electric yellow for the live line; Archivo condensed numerals, Inter text.
-   LAYOUT: board (value + chart) first screen, then my cards, search, movers, constituents, method. */
-:root{color-scheme:light dark;--bg:light-dark(#ffffff,#111215);--ink:light-dark(#121316,#f1f1ee);--mute:light-dark(#5d6068,#a3a6ad);--line:light-dark(#e6e6e3,#2a2c31);--card:light-dark(#f6f6f4,#1a1b1f);--red:#d42a12;--red2:#a81f0b;--yel:#ffcc00;--up:light-dark(#0b7a3b,#46c37b);--down:light-dark(#c2210c,#ff6b57)}
+/* VOICE: a card shop's daily price board: brisk, numeric, collector-friendly.
+   IDEA: the board above the counter, with the most valuable cards fanned out in the window.
+   PICTURE: real card art in a holo fan beside the index; the index line large on the red board.
+   COLOUR and TYPE: shop-sign red board, white sheet; energy-type colours per group (fire, gold, psychic, water, electric blue); Archivo condensed numerals, Inter text.
+   LAYOUT: board (value, fan, chart, groups), market pulse charts, my cards + search, movers, constituents, method. */
+:root{color-scheme:light dark;--bg:light-dark(#ffffff,#111215);--ink:light-dark(#121316,#f1f1ee);--mute:light-dark(#5d6068,#a3a6ad);--line:light-dark(#e7e7e4,#2a2c31);--card:light-dark(#f5f5f2,#1b1c20);--red:#c8270f;--red2:#9c1c08;--yel:#ffcc00;--up:light-dark(#0b7a3b,#46c37b);--down:light-dark(#c2210c,#ff6b57);
+--c-all:#ff4b2b;--c-vintage:#e8a400;--c-modern:#8b5cf6;--c-current:#0fb5ae;--c-blue:#3b82f6}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Inter,system-ui,sans-serif;overflow-x:clip}
 h1,h2,h3,.num{font-family:Archivo,Inter,sans-serif;font-stretch:80%}
-h1{font-size:clamp(24px,4vw,34px);line-height:1.05;margin:0;font-weight:700;text-wrap:balance}
+h1{font-size:clamp(24px,4vw,34px);line-height:1.05;margin:0;font-weight:700}
 h2{font-size:clamp(24px,3.4vw,32px);line-height:1.05;margin:0 0 6px;font-weight:700}
+h3{font-size:19px;margin:0 0 8px;font-weight:700}
 .wrap{max-width:1240px;margin:0 auto}
 .band{padding:clamp(22px,4vw,56px) max(5vw,16px)}
 a{color:inherit}
 button,input,select{font:inherit;font-size:16px}
 button{cursor:pointer}
 :focus-visible{outline:3px solid var(--yel);outline-offset:2px}
-.sub{color:var(--mute);margin:0 0 18px;max-width:68ch}
+.sub{color:var(--mute);margin:0 0 16px;max-width:68ch}
+.up{color:var(--up)}.down{color:var(--down)}
 /* board */
-.board{background:var(--red);color:#fff;background-image:linear-gradient(160deg,var(--red),var(--red2))}
-.board .sub{color:#ffe0d9}
+.board{background:linear-gradient(160deg,var(--red),var(--red2));color:#fff;position:relative;overflow:hidden}
+.board::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(135deg,rgba(255,255,255,.035) 0 2px,transparent 2px 14px);pointer-events:none}
+.board .wrap{position:relative}
+.board .up{color:#c9ffd9}.board .down{color:#fff1a8}
 .top{display:flex;flex-wrap:wrap;gap:8px 20px;align-items:baseline;justify-content:space-between}
 .meta{font-size:14px;color:#ffe0d9}
-.hero{display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:20px 36px;margin-top:22px;align-items:start}
-.big{font-size:clamp(56px,6.6vw,92px);line-height:.9;font-weight:800;letter-spacing:-.01em;white-space:nowrap}
-.seglabel{font-size:15px;color:#ffe0d9;margin-bottom:6px}
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,420px);gap:20px 36px;margin-top:18px;align-items:center}
+.seglabel{font-size:15px;color:#ffe0d9;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex:none;box-shadow:0 0 0 2px rgba(255,255,255,.6)}
+.big{font-size:clamp(60px,8vw,100px);line-height:.9;font-weight:800;white-space:nowrap}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
 .chip{background:rgba(0,0,0,.22);border-radius:8px;padding:6px 10px;font-size:14px;white-space:nowrap}
 .chip b{font-family:Archivo,sans-serif;font-stretch:85%;font-size:17px;margin-left:4px}
-.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
-.tab{min-height:40px;padding:6px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.45);background:transparent;color:#fff;font-size:15px}
+.stat{margin-top:12px;font-size:14px;color:#ffe0d9}
+/* card fan */
+.fan{position:relative;height:250px}
+.fan button{position:absolute;bottom:0;left:50%;width:clamp(84px,11vw,132px);aspect-ratio:63/88;border:0;padding:0;background:#0003;border-radius:6px;transform-origin:50% 120%;box-shadow:0 10px 24px rgba(0,0,0,.35);transition:transform .25s ease}
+.fan button img{width:100%;height:100%;object-fit:cover;border-radius:6px;display:block}
+.fan .tag{position:absolute;left:50%;bottom:-6px;transform:translate(-50%,100%);background:#fff;color:var(--red2);font:700 13px/1 Archivo,sans-serif;font-stretch:85%;padding:4px 7px;border-radius:5px;white-space:nowrap;opacity:0;transition:opacity .2s}
+.fan button:hover .tag,.fan button:focus-visible .tag{opacity:1}
+.fancap{text-align:center;font-size:13px;color:#ffe0d9;margin-top:30px}
+/* holo foil */
+.holo{position:relative;overflow:hidden}
+.holo::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(115deg,transparent 25%,rgba(255,255,255,.5) 38%,rgba(255,60,200,.28) 44%,rgba(40,220,255,.28) 51%,rgba(255,240,90,.3) 58%,transparent 72%);background-size:260% 260%;background-position:100% 100%;mix-blend-mode:color-dodge;opacity:.35}
+@media(prefers-reduced-motion:no-preference){.holo:hover::after,.holo:focus-visible::after{animation:foil 1.6s ease-in-out infinite alternate;opacity:.9}@keyframes foil{from{background-position:100% 100%}to{background-position:0 0}}.line-anim{stroke-dasharray:5000;stroke-dashoffset:5000;animation:draw 1.2s ease-out forwards}@keyframes draw{to{stroke-dashoffset:0}}}
+/* chart controls */
+.ctrl{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;justify-content:space-between;margin:22px 0 8px}
+.tabs{display:flex;flex-wrap:wrap;gap:6px}
+.tab{min-height:38px;padding:5px 13px;border-radius:999px;border:1px solid rgba(255,255,255,.45);background:transparent;color:#fff;font-size:14px;display:inline-flex;align-items:center;gap:6px}
 .tab[aria-pressed=true]{background:#fff;color:var(--red2);border-color:#fff;font-weight:600}
-.ranges .tab{min-height:34px;padding:4px 12px;font-size:14px}
-.fig{position:relative;min-height:300px}.fig>svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
-.tip{position:absolute;pointer-events:none;background:#111;color:#fff;padding:6px 9px;border-radius:6px;font-size:13px;white-space:nowrap;transform:translate(-50%,-110%);display:none}
+.fig{position:relative;min-height:320px}.fig>svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.fig.s{min-height:220px}.fig.xs{min-height:150px}
+.tip{position:absolute;pointer-events:none;background:#111;color:#fff;padding:6px 9px;border-radius:6px;font-size:13px;line-height:1.35;white-space:nowrap;transform:translate(-50%,-112%);display:none;z-index:2}
 .early{background:rgba(0,0,0,.18);border-radius:12px;padding:16px;min-height:300px}
-.early p{margin:0 0 12px;color:#ffe9e4;font-size:15px}
-.mrow{display:grid;grid-template-columns:120px minmax(0,1fr) 64px;gap:10px;align-items:center;margin:10px 0;font-size:15px}
+.early p{margin:0 0 12px;color:#ffe9e4;font-size:15px;max-width:72ch}
+.mrow{display:grid;grid-template-columns:130px minmax(0,1fr) 64px;gap:10px;align-items:center;margin:12px 0;font-size:15px}
 .mbar{height:12px;background:rgba(255,255,255,.18);border-radius:6px;position:relative}
-.mbar i{position:absolute;top:0;bottom:0;border-radius:6px;background:var(--yel)}
-.mbar .mid{position:absolute;left:50%;top:-3px;bottom:-3px;width:2px;background:rgba(255,255,255,.7)}
-/* segment tiles */
-.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:22px}
-.tile{background:rgba(0,0,0,.2);border:0;color:#fff;text-align:left;border-radius:12px;padding:12px;min-height:44px}
+.mbar i{position:absolute;top:0;bottom:0;border-radius:6px}
+.mbar .mid{position:absolute;left:50%;top:-4px;bottom:-4px;width:2px;background:rgba(255,255,255,.8)}
+.tiles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:18px}
+.tile{background:rgba(0,0,0,.2);border:0;color:#fff;text-align:left;border-radius:12px;padding:12px;min-height:44px;border-top:4px solid var(--c)}
 .tile[aria-pressed=true]{outline:2px solid #fff}
-.tile .n{font-size:28px;font-weight:700;line-height:1.1}
+.tile .n{font-size:26px;font-weight:700;line-height:1.1;display:block}
 .tile small{display:block;color:#ffe0d9;font-size:13px}
 /* sheet */
-.up{color:var(--up)}.down{color:var(--down)}.board .up{color:#c9ffd9}.board .down{color:#fff1a8}
-.row{display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);width:100%;background:none;border-left:0;border-right:0;border-top:0;color:inherit;text-align:left}
-.row img,.ph{width:56px;height:78px;object-fit:cover;border-radius:4px;background:var(--card)}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(18px,3vw,40px)}
+.panel-c{background:var(--card);border-radius:14px;padding:16px}
+.panel-c .sub{font-size:14px;margin-bottom:10px}
+.stack{display:flex;height:22px;border-radius:6px;overflow:hidden;margin:6px 0 8px}
+.stack i{display:block}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13px;color:var(--mute)}
+.legend span{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.hbar{display:grid;grid-template-columns:76px minmax(0,1fr) 56px;gap:8px;align-items:center;font-size:14px;margin:7px 0}
+.hbar .tr{height:14px;background:light-dark(#e9e9e5,#2a2b30);border-radius:4px;position:relative;overflow:hidden}
+.hbar .tr i{position:absolute;left:0;top:0;bottom:0;border-radius:4px}
+.hbar .v{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.hbar.b4{grid-template-columns:76px minmax(0,1fr) 48px 58px}
+.setrow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 58px;gap:8px;align-items:center;font-size:14px;margin:6px 0}
+.setrow .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.div{height:12px;position:relative;background:light-dark(#efefeb,#26272c);border-radius:4px}
+.div i{position:absolute;top:0;bottom:0;border-radius:4px}
+.div .mid{position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:var(--mute)}
+.setsplit{font-size:12px;color:var(--mute);margin:10px 0 2px}
+.row{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);width:100%;background:none;border-left:0;border-right:0;border-top:0;color:inherit;text-align:left}
+.thumb{width:52px;aspect-ratio:63/88;border-radius:4px;background:var(--card);display:block}
+.thumb img{width:100%;height:100%;object-fit:cover;border-radius:4px;display:block}
 .row .t{font-weight:600;line-height:1.25}
 .row .s{color:var(--mute);font-size:14px}
-.row .p{text-align:right;white-space:nowrap}
-.row .p b{font-family:Archivo,sans-serif;font-stretch:85%;font-size:20px;display:block}
-.row .p span{font-size:14px}
-.cols{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:clamp(20px,4vw,56px)}
-.head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+.row .p{text-align:right;white-space:nowrap;display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.row .p b{font-family:Archivo,sans-serif;font-stretch:85%;font-size:20px}
+.row .p span{font-size:13px}
+.spark{width:72px;height:22px;display:block}
+.cols{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:clamp(20px,4vw,56px)}
 .btn{min-height:44px;padding:8px 16px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-weight:600}
 .btn.pri{background:var(--red);border-color:var(--red);color:#fff}
 .total{display:flex;gap:18px;flex-wrap:wrap;margin:6px 0 10px;font-size:15px;color:var(--mute)}
 .total b{color:var(--ink);font-family:Archivo,sans-serif;font-stretch:85%;font-size:22px;margin-left:4px}
-.search{display:flex;gap:8px;margin:10px 0}
-.search input{flex:1;min-height:46px;padding:8px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
-.empty{color:var(--mute);padding:18px 0}
+.search{position:relative;display:flex;gap:8px;margin:10px 0}
+.search input{flex:1;min-height:48px;padding:8px 14px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.sugg{position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--bg);border:1px solid var(--line);border-radius:12px;box-shadow:0 14px 32px rgba(0,0,0,.18);list-style:none;margin:0;padding:6px;z-index:5;max-height:360px;overflow-y:auto}
+.sugg li{display:flex;justify-content:space-between;gap:12px;padding:10px 12px;border-radius:8px;cursor:pointer;min-height:44px;align-items:center}
+.sugg li[aria-selected=true],.sugg li:hover{background:var(--card)}
+.sugg mark{background:none;color:var(--red);font-weight:700}
+.sugg small{color:var(--mute);white-space:nowrap}
+.empty{color:var(--mute);padding:14px 0}
 .movers{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px}
 table{width:100%;border-collapse:collapse;font-size:15px}
 th,td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
@@ -81,28 +124,23 @@ th{font-weight:600;color:var(--mute);font-size:13px}
 td.r,th.r{text-align:right;white-space:nowrap}
 details summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;align-items:center}
 .notes{font-size:14px;color:var(--mute)}
-.method p{max-width:70ch}
-/* drawer */
+.method p{max-width:72ch}
 .dr{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;z-index:9}
 .dr.open{display:block}
-.panel{position:absolute;right:0;top:0;bottom:0;width:min(520px,100%);background:var(--bg);overflow-y:auto;padding:20px max(4vw,16px) 40px}
-.ph2{display:grid;grid-template-columns:120px minmax(0,1fr);gap:16px;align-items:start}
-.ph2 img{width:120px;border-radius:6px}
-.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:16px 0}
-.stats div{background:var(--card);border-radius:8px;padding:8px}
-.stats small{display:block;color:var(--mute);font-size:13px}
-.stats b{font-family:Archivo,sans-serif;font-stretch:85%;font-size:19px}
-.links{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.panel{position:absolute;right:0;top:0;bottom:0;width:min(540px,100%);background:var(--bg);overflow-y:auto;padding:18px max(4vw,16px) 40px}
+.dhead{display:flex;justify-content:flex-end;margin-bottom:6px}
+.ph2{display:grid;grid-template-columns:150px minmax(0,1fr);gap:18px;align-items:start}
+.ph2 .holo{border-radius:8px;box-shadow:0 10px 26px rgba(0,0,0,.3)}
+.ph2 img{width:100%;display:block;border-radius:8px}
+.ladder .hbar{grid-template-columns:96px minmax(0,1fr) 72px}
+.links{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
 .links a{min-height:44px;display:inline-flex;align-items:center;padding:8px 14px;border-radius:10px;background:var(--card);text-decoration:none;font-weight:600}
-.form{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;align-items:end;margin-top:14px}
+.form{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;align-items:end;margin-top:12px}
 .form label{font-size:13px;color:var(--mute)}
 .form input,.form select{width:100%;min-height:44px;padding:6px 10px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
-.fig.small{min-height:200px}
-.small .tip{background:var(--ink);color:var(--bg)}
-.msg{font-size:14px;margin-top:8px;min-height:20px}
-@media(max-width:860px){.hero{grid-template-columns:minmax(0,1fr)}.cols,.movers{grid-template-columns:minmax(0,1fr)}.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:600px){table{font-size:13px}.mrow{grid-template-columns:96px minmax(0,1fr) 56px}.hide-s{display:none}.form{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
-@media(prefers-reduced-motion:no-preference){.line-anim{stroke-dasharray:4000;stroke-dashoffset:4000;animation:draw 1.1s ease-out forwards}@keyframes draw{to{stroke-dashoffset:0}}}
+.light .tip{background:var(--ink);color:var(--bg)}
+@media(max-width:900px){.hero{grid-template-columns:minmax(0,1fr)}.fan{height:190px}.grid3,.cols,.movers{grid-template-columns:minmax(0,1fr)}.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){table{font-size:13px}.mrow{grid-template-columns:100px minmax(0,1fr) 56px}.hide-s{display:none}.form{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.ph2{grid-template-columns:110px minmax(0,1fr)}.spark{display:none}.fig{min-height:260px}}
 </style>
 </head>
 <body>
@@ -111,30 +149,47 @@ details summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;alig
     <div class="top"><h1>UK Pokémon Card Index</h1><div class="meta" id="meta">Loading prices…</div></div>
     <div class="hero">
       <div>
-        <div class="seglabel" id="seglabel">All cards, base 1,000</div>
+        <div class="seglabel" id="seglabel"></div>
         <div class="big num" id="big">—</div>
         <div class="chips" id="chips"></div>
+        <div class="stat" id="stat"></div>
       </div>
-      <div>
-        <div class="tabs ranges" id="ranges"></div>
-        <div id="chartbox"></div>
-      </div>
+      <div><div class="fan" id="fan" aria-label="Most valuable blue-chip cards"></div><div class="fancap" id="fancap"></div></div>
     </div>
+    <div class="ctrl"><div class="tabs" id="ranges"></div><div class="tabs" id="modes"></div></div>
+    <div id="chartbox"></div>
     <div class="tiles" id="tiles"></div>
   </div>
 </section>
 
 <section class="band">
+  <div class="wrap">
+    <h2>Market pulse</h2>
+    <p class="sub" id="pulsesub"></p>
+    <div class="grid3">
+      <div class="panel-c light"><h3>Breadth</h3><p class="sub" id="brsub"></p><div id="breadth"></div></div>
+      <div class="panel-c"><h3>By price band</h3><p class="sub">How many cards sit in each band, and each band's 7-day vs 30-day momentum.</p><div id="bands"></div></div>
+      <div class="panel-c"><h3>Sets on the move</h3><p class="sub">Sets with at least 15 cards at £3+, ranked by the median card's 7-day vs 30-day momentum.</p><div id="sets"></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="band" style="padding-top:0">
   <div class="wrap cols">
     <div>
-      <div class="head"><div><h2>My cards</h2></div></div>
+      <h2>My cards</h2>
       <div class="total" id="totals"></div>
+      <div id="pfchart"></div>
       <div id="watch"></div>
     </div>
     <div>
       <h2>Find a card</h2>
-      <p class="sub">Live Cardmarket prices in pounds. Tap a result to see it, add it to your cards, or check UK sold prices on eBay.</p>
-      <form class="search" id="sform"><input id="q" type="search" placeholder="e.g. Umbreon VMAX" autocomplete="off" aria-label="Card name"><button class="btn pri" type="submit">Search</button></form>
+      <p class="sub">Start typing a name and pick from the list. Prices are live from Cardmarket, in pounds.</p>
+      <form class="search" id="sform" autocomplete="off" role="search">
+        <input id="q" type="search" placeholder="Try char, umbreon, iono" aria-label="Card name" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="sugg">
+        <button class="btn pri" type="submit">Search</button>
+        <ul class="sugg" id="sugg" role="listbox" hidden></ul>
+      </form>
       <div id="results"></div>
     </div>
   </div>
@@ -142,7 +197,7 @@ details summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;alig
 
 <section class="band" style="padding-top:0">
   <div class="wrap">
-    <h2 id="movtitle">Biggest moves</h2>
+    <h2>Biggest moves</h2>
     <p class="sub" id="movsub"></p>
     <div class="movers"><div><h3>Rising</h3><div id="rise"></div></div><div><h3>Falling</h3><div id="fall"></div></div></div>
   </div>
@@ -150,13 +205,13 @@ details summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;alig
 
 <section class="band" style="padding-top:0">
   <div class="wrap">
-    <details><summary><span>Index constituents (<span id="ccount">0</span> cards)</span></summary>
-      <div class="scroll"><table><thead><tr><th>Card</th><th class="hide-s">Segment</th><th class="r">Price</th><th class="r">Trend</th><th class="r">7d vs 30d</th></tr></thead><tbody id="ctable"></tbody></table></div>
+    <details><summary><span>Blue-chip cards (<span id="ccount">0</span>)</span></summary>
+      <div class="scroll"><table><thead><tr><th>Card</th><th class="hide-s">Group</th><th class="r">Price</th><th class="r hide-s">Trend</th><th class="r">7d vs 30d</th></tr></thead><tbody id="ctable"></tbody></table></div>
     </details>
     <div class="method">
       <h2 style="margin-top:28px">How the index works</h2>
-      <p>Prices come from Cardmarket, Europe's main card marketplace, through the free TCGdex API. Each night the tracker takes the median of every card's Cardmarket trend price, 7-day average and 30-day average (the median stops one jumpy figure moving a card, which matters for vintage cards where listings mix conditions), converts it to pounds at the day's ECB euro reference rate, and stores it.</p>
-      <p>The index is chain-linked and equal-weighted: each day it moves by the geometric mean of every card's price change since the day before, so a £20 card counts as much as a £2,000 one. Each card's single-day move is capped at roughly +49% or −33% to stop thin listings swinging the index. It started at 1,000 on its first day, and the sub-indices split cards into Vintage (1999 to 2009), Modern (2010 to 2022) and Current era (2023 on: Scarlet &amp; Violet and Mega Evolution).</p>
+      <p>Every night the tracker prices every English Pokémon card on TCGdex (about 20,000, TCG Pocket excluded) using Cardmarket, Europe's main card marketplace. Each card's price is the median of its Cardmarket trend price, 7-day average and 30-day average, converted to pounds at the day's ECB euro reference rate. The median stops one jumpy figure moving a card, which matters for vintage cards where listings mix conditions.</p>
+      <p>The market index covers every card worth £3 or more on the previous night, so bulk commons don't swamp it. It is chain-linked and equal-weighted: each day it moves by the geometric mean of every card's price change since the night before, with each card's move capped at roughly +49% or −33%. It started at 1,000. Vintage is sets from 1999 to 2009, Modern 2010 to 2022, and Current era 2023 on (Scarlet &amp; Violet, Mega Evolution). Blue chip is a fixed basket of 53 sought-after cards.</p>
       <p>Until there's enough nightly history, the board shows momentum: each group's 7-day average sale price against its 30-day average. Prices are for raw, ungraded cards and include the currency effect, so a weaker pound pushes the index up. For a UK sold-price check on any card, use its eBay UK link.</p>
       <p class="notes" id="notes"></p>
     </div>
@@ -170,160 +225,204 @@ details summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;alig
 const $ = (s) => document.querySelector(s);
 const GBP = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' });
 const GBP0 = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP', maximumFractionDigits: 0 });
-const N = new Intl.NumberFormat('en-GB', { maximumFractionDigits: 1, minimumFractionDigits: 1 });
-const money = (v) => v == null ? '—' : (v >= 1000 ? GBP0 : GBP).format(v);
+const N1 = new Intl.NumberFormat('en-GB', { maximumFractionDigits: 1, minimumFractionDigits: 1 });
+const N0 = new Intl.NumberFormat('en-GB');
+const money = (v) => v == null ? '—' : (Math.abs(v) >= 1000 ? GBP0 : GBP).format(v);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const pct = (v, dp = 1) => v == null || !isFinite(v) ? '—' : (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(dp) + '%';
 const cls = (v) => v == null ? '' : v > 0 ? 'up' : v < 0 ? 'down' : '';
-const dfmt = (d) => new Date(d + 'T12:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' });
+const dfmt = (d) => new Date(d + 'T12:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+const dfmtY = (d) => new Date(d + 'T12:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+const SEGS = [['all', 'All market', 'var(--c-all)', '#ff4b2b'], ['vintage', 'Vintage', 'var(--c-vintage)', '#e8a400'], ['modern', 'Modern', 'var(--c-modern)', '#8b5cf6'], ['current', 'Current era', 'var(--c-current)', '#0fb5ae'], ['blue', 'Blue chip 53', 'var(--c-blue)', '#3b82f6']];
+const SEG = Object.fromEntries(SEGS.map((s) => [s[0], s]));
+const RANGES = [['1M', 31], ['3M', 92], ['1Y', 366], ['All', 0]];
 const REPO = 'Mrhuggies/uk-pokemon-index';
-const SEGS = [['all', 'All cards'], ['vintage', 'Vintage'], ['modern', 'Modern'], ['current', 'Current era']];
-const RANGES = [['1M', 31], ['3M', 92], ['1Y', 366], ['All', 1e9]];
-let D = null, seg = 'all', range = 'All', recs = {}, lastResults = [];
-const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
-range = store.get('range') || 'All';
+const T = 'https://api.tcgdex.net/v2/en';
+const ls = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
+let D = null, seg = 'all', range = ls.get('range') || 'All', mode = ls.get('mode') || 'single', recs = {}, NAMES = null;
 
-function series(arr, dates) {
-  const days = RANGES.find((r) => r[0] === range)[1];
-  const cutoff = days > 5000 ? '' : new Date(Date.now() - days * 864e5).toISOString().slice(0, 10);
-  return dates.map((d, i) => [d, arr[i]]).filter(([d, v]) => v != null && d >= cutoff);
+const thumb = (r, cls2 = 'thumb') => `<span class="${cls2} holo">${r.img ? `<img src="${esc(r.img)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : ''}</span>`;
+const mom = (r) => r.avg7 > 0 && r.avg30 > 0 ? (r.avg7 / r.avg30 - 1) * 100 : null;
+
+function cutoffIdx(dates) {
+  const days = RANGES.find((r) => r[0] === range)[1]; if (!days) return 0;
+  const c = new Date(new Date(dates[dates.length - 1] + 'T12:00:00Z') - days * 864e5).toISOString().slice(0, 10);
+  const k = dates.findIndex((d) => d >= c); return k < 0 ? 0 : k;
 }
 function changeOver(arr, dates, days) {
   if (!arr || arr.length < 2) return null;
   const last = arr[arr.length - 1];
   if (days === 1) { const p = arr[arr.length - 2]; return p ? (last / p - 1) * 100 : null; }
   const target = new Date(new Date(dates[dates.length - 1] + 'T12:00:00Z') - days * 864e5).toISOString().slice(0, 10);
-  let k = dates.findIndex((d) => d >= target);
-  if (k < 0 || k >= arr.length - 1 || dates[0] > target) return null;
+  if (dates[0] > target) return null;
+  const k = dates.findIndex((d) => d >= target);
   return arr[k] ? (last / arr[k] - 1) * 100 : null;
 }
 
-function drawLine(box, pts, opts = {}) {
-  box.innerHTML = '<svg role="img" aria-label="' + esc(opts.label || 'Price chart') + '"></svg><div class="tip"></div>';
+// Generic line chart. series: [{name, color, pts:[[date, value]]}]; fmt formats axis/tooltip values.
+function chart(box, series, o = {}) {
+  box.innerHTML = '<svg role="img" aria-label="' + esc(o.label || 'Chart') + '"></svg><div class="tip"></div>';
   const s = box.querySelector('svg'), tip = box.querySelector('.tip');
+  const fmt = o.fmt || ((v) => N1.format(v));
   const draw = () => {
-    const W = s.clientWidth, H = s.clientHeight; if (!W || !H) return;
-    const narrow = W < 520, pl = 4, pr = narrow ? 44 : 56, pt = 14, pb = 26;
-    const vals = pts.map((p) => p[1]); let lo = Math.min(...vals), hi = Math.max(...vals);
-    if (lo === hi) { lo *= 0.98; hi *= 1.02; } const pad = (hi - lo) * 0.12; lo -= pad; hi += pad;
-    const x = (i) => pl + (pts.length === 1 ? (W - pl - pr) / 2 : i * (W - pl - pr) / (pts.length - 1));
+    const W = s.clientWidth, H = s.clientHeight; if (!W || !H || !series.length) return;
+    const narrow = W < 520, pl = 2, pr = narrow ? 48 : 60, pt = 12, pb = 26;
+    const all = series.flatMap((x) => x.pts.map((p) => p[1]));
+    let lo = Math.min(...all), hi = Math.max(...all); if (lo === hi) { lo -= Math.abs(lo) * 0.02 || 1; hi += Math.abs(hi) * 0.02 || 1; }
+    const pad = (hi - lo) * 0.1; lo -= pad; hi += pad;
+    const dates = series[0].pts.map((p) => p[0]); const n = dates.length;
+    const x = (i) => pl + (n === 1 ? (W - pl - pr) / 2 : i * (W - pl - pr) / (n - 1));
     const y = (v) => pt + (hi - v) / (hi - lo) * (H - pt - pb);
-    const ink = opts.ink || '#fff', faint = opts.faint || 'rgba(255,255,255,.25)', stroke = opts.stroke || '#ffcc00';
-    const ticks = 4; let g = '';
-    for (let t = 0; t <= ticks; t++) { const v = lo + (hi - lo) * t / ticks, yy = y(v); g += `<line x1="${pl}" x2="${W - pr}" y1="${yy}" y2="${yy}" stroke="${faint}"/><text x="${W - pr + 6}" y="${yy + 4}" fill="${ink}" font-size="12" opacity=".8">${opts.money ? money(v).replace('.00', '') : Math.round(v)}</text>`; }
-    const lbl = narrow ? [0, pts.length - 1] : [0, Math.floor((pts.length - 1) / 2), pts.length - 1];
-    for (const i of [...new Set(lbl)]) g += `<text x="${x(i)}" y="${H - 6}" fill="${ink}" font-size="12" opacity=".8" text-anchor="${i === 0 ? 'start' : i === pts.length - 1 ? 'end' : 'middle'}">${dfmt(pts[i][0])}</text>`;
-    const d = pts.map((p, i) => (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(p[1]).toFixed(1)).join('');
-    const area = d + `L${x(pts.length - 1)} ${H - pb}L${x(0)} ${H - pb}Z`;
-    s.innerHTML = g + `<path d="${area}" fill="${stroke}" opacity=".12"/><path class="line-anim" d="${d}" fill="none" stroke="${stroke}" stroke-width="2.5" stroke-linejoin="round"/>` +
-      pts.map((p, i) => pts.length < 40 ? `<circle cx="${x(i)}" cy="${y(p[1])}" r="3" fill="${stroke}"/>` : '').join('') + `<circle id="dot" r="5" fill="${stroke}" stroke="${ink}" stroke-width="2" style="display:none"/>`;
-    const dot = s.querySelector('#dot');
+    const ink = o.ink || 'rgba(255,255,255,.85)', faint = o.faint || 'rgba(255,255,255,.18)';
+    let g = '';
+    for (let t = 0; t <= 4; t++) { const v = lo + (hi - lo) * t / 4, yy = y(v); g += `<line x1="${pl}" x2="${W - pr}" y1="${yy}" y2="${yy}" stroke="${faint}"/><text x="${W - pr + 6}" y="${yy + 4}" fill="${ink}" font-size="12">${esc(fmt(v, true))}</text>`; }
+    if (o.zero != null && o.zero > lo && o.zero < hi) g += `<line x1="${pl}" x2="${W - pr}" y1="${y(o.zero)}" y2="${y(o.zero)}" stroke="${ink}" stroke-dasharray="3 4" opacity=".6"/>`;
+    const lbl = narrow ? [0, n - 1] : [0, Math.round((n - 1) / 3), Math.round(2 * (n - 1) / 3), n - 1];
+    for (const i of [...new Set(lbl)]) g += `<text x="${x(i)}" y="${H - 6}" fill="${ink}" font-size="12" text-anchor="${i === 0 ? 'start' : i === n - 1 ? 'end' : 'middle'}">${dfmt(dates[i])}</text>`;
+    for (const sr of series) {
+      const d = sr.pts.map((p, i) => p[1] == null ? '' : (i && sr.pts[i - 1][1] != null ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(p[1]).toFixed(1)).join('');
+      if (series.length === 1 && o.area !== false) g += `<path d="${d}L${x(n - 1)} ${H - pb}L${x(0)} ${H - pb}Z" fill="${sr.color}" opacity=".16"/>`;
+      g += `<path class="line-anim" d="${d}" fill="none" stroke="${sr.color}" stroke-width="${series.length === 1 ? 2.8 : 2.2}" stroke-linejoin="round" stroke-linecap="round"/>`;
+      if (n < 32) g += sr.pts.map((p, i) => p[1] == null ? '' : `<circle cx="${x(i)}" cy="${y(p[1])}" r="2.6" fill="${sr.color}"/>`).join('');
+      const lp = sr.pts[n - 1]; if (lp && lp[1] != null) g += `<circle cx="${x(n - 1)}" cy="${y(lp[1])}" r="4.5" fill="${sr.color}" stroke="${o.dotRing || '#fff'}" stroke-width="2"/>`;
+    }
+    g += `<line id="cur" y1="${pt}" y2="${H - pb}" stroke="${ink}" opacity=".5" style="display:none"/>`;
+    s.innerHTML = g;
+    const cur = s.querySelector('#cur');
     const move = (ev) => {
       const r = s.getBoundingClientRect(); const cx = (ev.touches ? ev.touches[0].clientX : ev.clientX) - r.left;
-      const i = Math.max(0, Math.min(pts.length - 1, Math.round((cx - pl) / ((W - pl - pr) / Math.max(1, pts.length - 1)))));
-      dot.setAttribute('cx', x(i)); dot.setAttribute('cy', y(pts[i][1])); dot.style.display = '';
-      tip.style.display = 'block'; tip.style.left = x(i) + 'px'; tip.style.top = y(pts[i][1]) + 'px';
-      tip.textContent = dfmt(pts[i][0]) + '  ' + (opts.money ? money(pts[i][1]) : N.format(pts[i][1]));
+      const i = Math.max(0, Math.min(n - 1, Math.round((cx - pl) / ((W - pl - pr) / Math.max(1, n - 1)))));
+      cur.setAttribute('x1', x(i)); cur.setAttribute('x2', x(i)); cur.style.display = '';
+      const top = Math.min(...series.map((sr) => sr.pts[i][1] == null ? H : y(sr.pts[i][1])));
+      tip.style.display = 'block'; tip.style.left = Math.max(70, Math.min(W - 70, x(i))) + 'px'; tip.style.top = top + 'px';
+      tip.innerHTML = `<b>${dfmtY(dates[i])}</b>` + series.map((sr) => `<br><span style="color:${sr.color}">●</span> ${esc(sr.name)} ${sr.pts[i][1] == null ? '—' : esc(fmt(sr.pts[i][1]))}`).join('');
     };
-    s.onpointermove = move; s.ontouchmove = move; s.onpointerleave = () => { tip.style.display = 'none'; dot.style.display = 'none'; };
+    s.onpointermove = move; s.onpointerdown = move; s.onpointerleave = () => { tip.style.display = 'none'; cur.style.display = 'none'; };
   };
   if (box._ro) box._ro.disconnect();
   box._ro = new ResizeObserver(draw); box._ro.observe(s);
 }
 
+function spark(vals, color) {
+  const v = vals.filter((x) => x != null); if (v.length < 2) return '';
+  const lo = Math.min(...v), hi = Math.max(...v), w = 72, h = 22;
+  const pts = v.map((y, i) => `${(i * w / (v.length - 1)).toFixed(1)},${(h - 2 - (hi === lo ? 0.5 : (y - lo) / (hi - lo)) * (h - 4)).toFixed(1)}`).join(' ');
+  return `<svg class="spark" viewBox="0 0 ${w} ${h}" aria-hidden="true"><polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.8" stroke-linejoin="round"/></svg>`;
+}
+
 function renderBoard() {
-  const h = D.history, L = D.latest;
-  const arr = h?.idx?.[seg] || [], dates = h?.dates || [];
-  const segName = SEGS.find((s) => s[0] === seg)[1];
-  $('#seglabel').textContent = segName + ', base 1,000';
-  $('#big').textContent = arr.length ? N.format(arr[arr.length - 1]) : '—';
-  const m = L?.momentum?.[seg] || {};
+  const h = D.history, L = D.latest, dates = h?.dates || [];
+  const [, name, , hex] = SEG[seg];
+  const arr = h?.idx?.[seg] || [];
+  $('#seglabel').innerHTML = `<span class="dot" style="background:${hex}"></span>${esc(name)}, base 1,000`;
+  $('#big').textContent = arr.length ? N1.format(arr[arr.length - 1]) : '—';
+  const m = L?.momentum?.[seg]?.vs30;
   const ch = [['1 day', changeOver(arr, dates, 1)], ['7 days', changeOver(arr, dates, 7)], ['30 days', changeOver(arr, dates, 30)]];
-  $('#chips').innerHTML = ch.filter((c) => c[1] != null).map(([k, v]) => `<span class="chip">${k}<b class="${cls(v)}">${pct(v)}</b></span>`).join('') +
-    `<span class="chip">7d vs 30d avg<b class="${cls(m.vs30)}">${pct(m.vs30)}</b></span>`;
-  $('#ranges').innerHTML = RANGES.map(([r]) => `<button type="button" class="tab" data-r="${r}" aria-pressed="${r === range}">${r}</button>`).join('');
+  $('#chips').innerHTML = ch.filter((c) => c[1] != null).map(([k, v]) => `<span class="chip">${k}<b class="${cls(v)}">${pct(v)}</b></span>`).join('') + `<span class="chip">7d vs 30d avg<b class="${cls(m)}">${pct(m)}</b></span>`;
+  const c = L?.counts; const nNow = h?.n?.[seg]?.[h.n[seg].length - 1];
+  $('#stat').textContent = c ? (seg === 'blue' ? `${c.basketPriced} of ${c.basket} blue-chip cards priced` : `${N0.format(nNow || 0)} cards in this group · ${N0.format(c.priced)} cards priced in total`) : '';
+  $('#ranges').innerHTML = dates.length >= 2 ? RANGES.map(([r]) => `<button type="button" class="tab" data-r="${r}" aria-pressed="${r === range}">${r}</button>`).join('') : '';
+  $('#modes').innerHTML = dates.length >= 2 ? [['single', 'This group'], ['compare', 'Compare groups']].map(([k, t]) => `<button type="button" class="tab" data-mode="${k}" aria-pressed="${k === mode}">${t}</button>`).join('') : '';
   const box = $('#chartbox');
-  const pts = series(arr, dates);
-  if (pts.length >= 2) {
-    box.className = 'fig'; drawLine(box, pts, { label: segName + ' index' });
+  if (dates.length >= 2) {
+    box.className = 'fig';
+    const k = cutoffIdx(dates), ds = dates.slice(k);
+    if (mode === 'compare') {
+      const series = SEGS.map(([key, nm, , col]) => { const a = h.idx[key].slice(k); const b = a.find((v) => v != null); return { name: nm, color: col, pts: ds.map((d, i) => [d, a[i] == null || !b ? null : (a[i] / b - 1) * 100]) }; });
+      chart(box, series, { label: 'Index groups compared', fmt: (v) => pct(v, 1), zero: 0 });
+    } else chart(box, [{ name, color: '#ffcc00', pts: ds.map((d, i) => [d, arr[k + i]]) }], { label: name + ' index' });
   } else {
     if (box._ro) box._ro.disconnect();
     box.className = 'early';
-    const rows = SEGS.map(([k, n]) => { const v = L?.momentum?.[k]?.vs30; const w = v == null ? 0 : Math.min(50, Math.abs(v) / 20 * 50); return `<div class="mrow"><span>${n}</span><div class="mbar"><i style="${v >= 0 ? 'left:50%' : 'right:50%'};width:${w}%"></i><span class="mid"></span></div><b class="num ${cls(v)}" style="text-align:right">${pct(v)}</b></div>`; }).join('');
-    $('#ranges').innerHTML = '';
-    box.innerHTML = `<p>The nightly history started ${dates[0] ? dfmt(dates[0]) : 'today'}, so the chart fills in as each night is added. For now, this is momentum: Cardmarket's 7-day average sale price against its 30-day average, across each group (bar ends at ±20%):</p>${rows}`;
+    const rows = SEGS.map(([k, n, , col]) => { const v = L?.momentum?.[k]?.vs30; const w = v == null ? 0 : Math.min(50, Math.abs(v) / 20 * 50); return `<div class="mrow"><span><span class="dot" style="background:${col}"></span> ${n}</span><div class="mbar"><i style="${v >= 0 ? 'left:50%' : 'right:50%'};width:${w}%;background:${col}"></i><span class="mid"></span></div><b class="num ${cls(v)}" style="text-align:right">${pct(v)}</b></div>`; }).join('');
+    box.innerHTML = `<p>The nightly history started ${dates[0] ? dfmt(dates[0]) : 'today'}, so the index chart draws from the second night. Until then, this is momentum: each group's 7-day average sale price against its 30-day average (bars end at ±20%).</p>${rows}`;
   }
-  $('#tiles').innerHTML = SEGS.map(([k, n]) => { const a = h?.idx?.[k] || []; const c = changeOver(a, dates, 1); const mm = L?.momentum?.[k]?.vs30; const cnt = (L?.records || []).filter((r) => r.inIndex && r.gbp != null && (k === 'all' || r.segment === k)).length;
-    return `<button type="button" class="tile" data-seg="${k}" aria-pressed="${k === seg}"><small>${n}</small><span class="n num">${a.length ? N.format(a[a.length - 1]) : '—'}</span><small>${c != null ? `<span class="${cls(c)}">${pct(c)}</span> today · ` : ''}${pct(mm)} 7d vs 30d · ${cnt} cards</small></button>`; }).join('');
+  $('#tiles').innerHTML = SEGS.map(([k, n, , col]) => { const a = h?.idx?.[k] || []; const cd = changeOver(a, dates, 1); const mm = L?.momentum?.[k]?.vs30;
+    return `<button type="button" class="tile" style="--c:${col}" data-seg="${k}" aria-pressed="${k === seg}"><small>${n}</small><span class="n num">${a.length ? N1.format(a[a.length - 1]) : '—'}</span><small>${cd != null ? `<span class="${cls(cd)}">${pct(cd)}</span> today · ` : ''}<span class="${cls(mm)}">${pct(mm)}</span> 7d/30d</small></button>`; }).join('');
 }
 
-function cardRow(r, extra = '') {
-  const c30 = r.avg7 && r.avg30 ? (r.avg7 / r.avg30 - 1) * 100 : null;
-  return `<button type="button" class="row" data-id="${esc(r.id)}">${r.img ? `<img src="${esc(r.img)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : '<span class="ph"></span>'}<span><span class="t">${esc(r.name)}</span><br><span class="s">${esc(r.set)} · ${esc(r.number)}${r.rarity ? ' · ' + esc(r.rarity) : ''}</span>${extra}</span><span class="p"><b>${money(r.gbp)}</b><span class="${cls(c30)}">${pct(c30)} 7d/30d</span></span></button>`;
+function renderFan() {
+  const top = (D.latest?.records || []).filter((r) => r.inIndex && r.gbp && r.img).sort((a, b) => b.gbp - a.gbp).slice(0, 5);
+  const ang = [-16, -8, 0, 8, 16].slice(0, top.length), off = [-104, -52, 0, 52, 104];
+  const order = [3, 1, 0, 2, 4]; // most valuable in the middle
+  const pos = top.map((r, i) => ({ r, slot: order[i] })).sort((a, b) => a.slot - b.slot);
+  $('#fan').innerHTML = pos.map(({ r, slot }) => `<button type="button" class="holo" data-id="${esc(r.id)}" style="transform:translateX(calc(-50% + ${off[slot] * (innerWidth < 600 ? .62 : 1)}px)) rotate(${ang[slot]}deg);z-index:${slot === 2 ? 5 : 5 - Math.abs(slot - 2)}" aria-label="${esc(r.name)}, ${money(r.gbp)}"><img src="${esc(r.img)}" alt="" onerror="this.style.visibility='hidden'"><span class="tag">${money(r.gbp)}</span></button>`).join('');
+  $('#fancap').textContent = top.length ? `Most valuable blue chips: ${top[0].name} leads at ${money(top[0].gbp)}` : '';
+  for (const b of document.querySelectorAll('#fan button')) {
+    const base = b.style.transform;
+    b.onpointerenter = () => { b.style.transform = base + ' translateY(-14px)'; };
+    b.onpointerleave = () => { b.style.transform = base; };
+  }
 }
 
-function dayChange(id) {
-  const s = D.history?.cards?.[id]; if (!s || s.length < 2) return null;
-  const a = s[s.length - 2], b = s[s.length - 1]; return a && b ? (b / a - 1) * 100 : null;
+function renderPulse() {
+  const L = D.latest, h = D.history; if (!L) return;
+  $('#pulsesub').textContent = `${N0.format(L.counts.market)} cards at £${L.counts.minGbp}+ out of ${N0.format(L.counts.priced)} priced English cards.`;
+  // breadth
+  const br = L.breadth;
+  if (br) {
+    const tot = br.adv + br.dec + br.flat || 1;
+    $('#brsub').textContent = `Of ${N0.format(tot)} index cards, how many rose, held or fell since last night.`;
+    let html = `<div class="stack" role="img" aria-label="${br.adv} up, ${br.flat} flat, ${br.dec} down"><i style="width:${br.adv / tot * 100}%;background:var(--up)"></i><i style="width:${br.flat / tot * 100}%;background:var(--mute);opacity:.4"></i><i style="width:${br.dec / tot * 100}%;background:var(--down)"></i></div><div class="legend"><span><i style="background:var(--up)"></i>${N0.format(br.adv)} up</span><span><i style="background:var(--mute);opacity:.4"></i>${N0.format(br.flat)} flat</span><span><i style="background:var(--down)"></i>${N0.format(br.dec)} down</span></div>`;
+    const pts = h.dates.map((d, i) => { const a = h.breadth.adv[i], dd = h.breadth.dec[i]; return [d, a == null ? null : a / Math.max(1, a + dd + h.breadth.flat[i]) * 100]; }).filter((p) => p[1] != null);
+    if (pts.length >= 2) html += '<div class="fig xs" id="brfig" style="margin-top:12px"></div>';
+    $('#breadth').innerHTML = html;
+    if (pts.length >= 2) chart($('#brfig'), [{ name: 'Share rising', color: '#0b7a3b', pts }], { fmt: (v) => Math.round(v) + '%', ink: 'currentColor', faint: 'rgba(128,128,128,.22)', zero: 50, area: false, dotRing: 'transparent', label: 'Share of cards rising each day' });
+  } else {
+    $('#brsub').textContent = 'Daily rises and falls appear after the second night. For now, how many cards have a 7-day average above their 30-day average:';
+    const live = (L.bands || []).reduce((a, b) => a + b.n, 0);
+    const up = L.momentum?.all?.vs30;
+    $('#breadth').innerHTML = `<div class="hbar"><span>All market</span><span class="tr"><i style="width:${Math.min(100, Math.abs(up || 0) * 5)}%;background:${up >= 0 ? 'var(--up)' : 'var(--down)'}"></i></span><span class="v ${cls(up)}">${pct(up)}</span></div><p class="notes">${N0.format(live)} cards at £${L.counts.minGbp}+.</p>`;
+  }
+  // bands
+  const maxN = Math.max(...(L.bands || []).map((b) => b.n), 1);
+  $('#bands').innerHTML = `<div class="hbar b4 notes"><span>Band</span><span>Cards</span><span></span><span class="v">7d/30d</span></div>` + (L.bands || []).map((b) => `<div class="hbar b4"><span>${b.hi ? `£${b.lo}–${b.hi}` : `£${N0.format(b.lo)}+`}</span><span class="tr"><i style="width:${Math.max(2, b.n / maxN * 100)}%;background:${b.mom >= 0 ? 'var(--c-current)' : 'var(--c-all)'}"></i></span><span class="v">${N0.format(b.n)}</span><b class="v num ${cls(b.mom)}">${pct(b.mom)}</b></div>`).join('');
+  // sets
+  const S = L.sets || []; const top = S.slice(0, 6), bot = S.slice(-6).reverse().filter((x) => !top.includes(x));
+  const mx = Math.max(...S.map((x) => Math.abs(x.mom)), 5);
+  const row = (x) => `<div class="setrow"><span class="nm" title="${esc(x.name)}">${esc(x.name)}</span><span class="div"><span class="mid"></span><i style="${x.mom >= 0 ? 'left:50%' : 'right:50%'};width:${Math.abs(x.mom) / mx * 50}%;background:${SEG[x.era]?.[3] || '#888'}"></i></span><b class="num ${cls(x.mom)}" style="text-align:right">${pct(x.mom)}</b></div>`;
+  $('#sets').innerHTML = S.length ? `<div class="setsplit">Rising fastest</div>${top.map(row).join('')}<div class="setsplit">Falling fastest</div>${bot.map(row).join('')}<div class="legend" style="margin-top:10px">${SEGS.slice(1, 4).map(([, n, , c]) => `<span><i style="background:${c}"></i>${n}</span>`).join('')}</div>` : '<p class="empty">No set data yet.</p>';
 }
+
+function cardRow(r, extra = '', right = null) {
+  const m = mom(r);
+  const series = D.history?.cards?.[r.id];
+  return `<button type="button" class="row" data-id="${esc(r.id)}">${thumb(r)}<span><span class="t">${esc(r.name)}</span><br><span class="s">${esc(r.set || '')}${r.number ? ' · ' + esc(r.number) : ''}${r.rarity ? ' · ' + esc(r.rarity) : ''}</span>${extra}</span><span class="p">${series ? spark(series, m >= 0 ? '#0b7a3b' : '#c2210c') : ''}<b>${money(r.gbp)}</b>${right ?? `<span class="${cls(m)}">${pct(m)} 7d/30d</span>`}</span></button>`;
+}
+function dayChange(id) { const s = D.history?.cards?.[id]; if (!s || s.length < 2) return null; const a = s[s.length - 2], b = s[s.length - 1]; return a && b ? (b / a - 1) * 100 : null; }
 
 function renderWatch() {
-  const w = D.watchlist.cards;
+  const w = D.watchlist.cards, h = D.history;
   let val = 0, cost = 0, hasCost = false;
   const rows = w.map((e) => {
-    const r = recs[e.id] || { id: e.id, name: e.id, set: 'Price arrives after the next update', number: '', gbp: null };
+    const r = recs[e.id] || { id: e.id, name: e.id, set: 'Price arrives after the next update', gbp: null };
     const qty = e.qty || 1;
     if (r.gbp) val += r.gbp * qty;
     if (e.cost != null) { cost += e.cost * qty; hasCost = true; }
     const dc = dayChange(e.id);
     const bits = [qty > 1 ? qty + ' ×' : '', e.cost != null ? 'paid ' + money(e.cost) : '', dc != null ? `<span class="${cls(dc)}">${pct(dc)} today</span>` : ''].filter(Boolean);
-    const extra = bits.length ? `<br><span class="s">${bits.join(' · ')}</span>` : '';
-    return cardRow(r, extra);
+    return cardRow(r, bits.length ? `<br><span class="s">${bits.join(' · ')}</span>` : '');
   });
-  $('#watch').innerHTML = rows.length ? rows.join('') : '<p class="empty">No cards yet. Search for a card, open it and tap Add card. It opens GitHub with the file ready; commit it and the card is priced within a few minutes, then every night.</p>';
+  $('#watch').innerHTML = rows.length ? rows.join('') : '<p class="empty">No cards yet. Find a card, open it and tap Add card. It opens GitHub with the file ready; commit it and the card is priced at the next run (about ten minutes), then every night.</p>';
   $('#totals').innerHTML = w.length ? `<span>Value<b>${money(val)}</b></span>${hasCost ? `<span>Paid<b>${money(cost)}</b></span><span>Gain<b class="${cls(val - cost)}">${money(val - cost)}</b></span>` : ''}` : '';
+  const pts = (h?.dates || []).map((d, i) => { let t = 0, any = false; for (const e of w) { const v = h.cards[e.id]?.[i]; if (v != null) { t += v * (e.qty || 1); any = true; } } return [d, any ? Math.round(t * 100) / 100 : null]; }).filter((p) => p[1] != null);
+  if (w.length && pts.length >= 2) { $('#pfchart').className = 'fig s light'; chart($('#pfchart'), [{ name: 'My cards', color: '#c8270f', pts }], { fmt: (v) => money(v), ink: 'currentColor', faint: 'rgba(128,128,128,.22)', dotRing: 'transparent', label: 'Value of my cards over time' }); }
+  else { $('#pfchart').className = ''; $('#pfchart').innerHTML = ''; }
 }
 
 function renderMovers() {
-  const idx = (D.latest?.records || []).filter((r) => r.inIndex && r.gbp != null);
-  const hasHist = (D.history?.dates?.length || 0) >= 2;
-  const scored = idx.map((r) => ({ r, v: hasHist ? dayChange(r.id) : (r.avg7 && r.avg30 ? (r.avg7 / r.avg30 - 1) * 100 : null) })).filter((x) => x.v != null);
-  scored.sort((a, b) => b.v - a.v);
-  $('#movsub').textContent = hasHist ? 'Index cards ranked by their change since the previous night.' : 'Index cards ranked by their 7-day average sale price against their 30-day average, until nightly history builds up.';
-  const row = (x) => cardRow(x.r);
-  $('#rise').innerHTML = scored.filter((x) => x.v > 0).slice(0, 5).map(row).join('') || '<p class="empty">Nothing rising.</p>';
-  $('#fall').innerHTML = scored.filter((x) => x.v < 0).slice(-5).reverse().map(row).join('') || '<p class="empty">Nothing falling.</p>';
+  const L = D.latest; const M = L?.movers;
+  if (!M) return;
+  for (const r of [...M.up, ...M.down]) if (!recs[r.id]) recs[r.id] = r;
+  $('#movsub').textContent = M.basis === 'day' ? `Cards worth £10+ with the biggest price change since last night, from the whole market.` : `Cards worth £10+ from the whole market where the 7-day average and the trend price agree on direction, ranked by the smaller move. Daily moves take over after the second night.`;
+  const right = (x) => `<span class="${cls(x.chg)}">${pct(x.chg)}${M.basis === 'day' ? ' today' : ' 7d/30d'}</span>`;
+  $('#rise').innerHTML = M.up.map((x) => cardRow(x, '', right(x))).join('') || '<p class="empty">Nothing rising.</p>';
+  $('#fall').innerHTML = M.down.map((x) => cardRow(x, '', right(x))).join('') || '<p class="empty">Nothing falling.</p>';
+  const idx = (L.records || []).filter((r) => r.inIndex && r.gbp != null).sort((a, b) => b.gbp - a.gbp);
   $('#ccount').textContent = idx.length;
-  const segn = Object.fromEntries(SEGS);
-  $('#ctable').innerHTML = idx.slice().sort((a, b) => b.gbp - a.gbp).map((r) => { const a30 = r.avg7 && r.avg30 ? (r.avg7 / r.avg30 - 1) * 100 : null;
-    return `<tr><td><a href="#" data-id="${esc(r.id)}">${esc(r.name)}</a><br><span class="notes">${esc(r.set)} ${esc(r.number)}</span></td><td class="hide-s">${segn[r.segment] || ''}</td><td class="r">${money(r.gbp)}</td><td class="r">${money(r.trend)}</td><td class="r ${cls(a30)}">${pct(a30)}</td></tr>`; }).join('');
-  const L = D.latest;
-  $('#notes').innerHTML = L ? `Last update ${new Date(L.generatedAt).toLocaleString('en-GB', { timeZone: 'Europe/London', dateStyle: 'medium', timeStyle: 'short' })} UK time. Exchange rate €1 = £${L.fx.rate.toFixed(4)} (${esc(L.fx.source)}, ${esc(L.fx.date || '')}). ${L.counts.priced} of ${L.counts.basket} index cards priced.${L.failed.length ? ' Not priced: ' + L.failed.map((f) => esc(f.id) + ' (' + esc(f.reason) + ')').join(', ') + '.' : ''}` : '';
+  $('#ctable').innerHTML = idx.map((r) => { const m = mom(r); return `<tr><td><a href="#" data-id="${esc(r.id)}">${esc(r.name)}</a><br><span class="notes">${esc(r.set)} ${esc(r.number)}</span></td><td class="hide-s">${SEG[r.segment]?.[1] || ''}</td><td class="r">${money(r.gbp)}</td><td class="r hide-s">${money(r.trend)}</td><td class="r ${cls(m)}">${pct(m)}</td></tr>`; }).join('');
+  $('#notes').innerHTML = `Last update ${new Date(L.generatedAt).toLocaleString('en-GB', { timeZone: 'Europe/London', dateStyle: 'medium', timeStyle: 'short' })} UK time. €1 = £${L.fx.rate.toFixed(4)} (${esc(L.fx.source)}, ${esc(L.fx.date || '')}). ${N0.format(L.counts.priced)} of ${N0.format(L.counts.universe)} cards had a Cardmarket price.${L.failed.length ? ' Not priced: ' + L.failed.map((f) => esc(f.id)).join(', ') + '.' : ''}`;
 }
-
-function openCard(id) {
-  const r = recs[id] || lastResults.find((x) => x.id === id); if (!r) return;
-  const w = D.watchlist.cards.find((c) => c.id === id);
-  const q = encodeURIComponent(`${r.name} ${r.set} ${r.number}`.trim());
-  const hist = D.history?.cards?.[id];
-  const pts = hist ? D.history.dates.map((d, i) => [d, hist[i]]).filter((p) => p[1] != null) : [];
-  $('#panel').innerHTML = `<div class="head"><span></span><button type="button" class="btn" id="close">Close</button></div>
-    <div class="ph2">${r.img ? `<img src="${esc(r.img.replace('/low.webp', '/high.webp'))}" alt="${esc(r.name)}">` : '<span class="ph"></span>'}<div><h2>${esc(r.name)}</h2><p class="sub">${esc(r.set)} · ${esc(r.number)}${r.rarity ? ' · ' + esc(r.rarity) : ''}</p><div class="big num" style="font-size:48px">${money(r.gbp)}</div><p class="notes">Cardmarket ${r.variant === 'holo' ? 'reverse holo ' : ''}price, median of trend and averages${r.eur ? ` (€${r.eur.toFixed(2)})` : ''}</p></div></div>
-    <div class="stats"><div><small>Trend</small><b>${money(r.trend)}</b></div><div><small>7-day avg</small><b>${money(r.avg7)}</b></div><div><small>30-day avg</small><b>${money(r.avg30)}</b></div></div>
-    ${pts.length >= 2 ? '<h3>Nightly history</h3><div class="fig small" id="cfig"></div>' : '<p class="notes">Nightly history appears here once this card has two nights of prices.</p>'}
-    <div class="links"><a href="https://www.ebay.co.uk/sch/i.html?_nkw=${q}&LH_Sold=1&LH_Complete=1" target="_blank" rel="noopener">eBay UK sold</a><a href="https://www.cardmarket.com/en/Pokemon/Products/Search?searchString=${encodeURIComponent(r.name)}" target="_blank" rel="noopener">Cardmarket</a></div>
-    <h3>${w ? 'In my cards' : 'Add to my cards'}</h3>
-    ${w ? `<p class="notes">${w.qty || 1} owned${w.cost != null ? ', paid ' + money(w.cost) + ' each' : ''}.</p>` : ''}
-    <form class="form" id="wform"><div><label for="fq">Quantity</label><input id="fq" inputmode="numeric" value="${w?.qty ?? ''}" placeholder="1"></div><div><label for="fc">Paid each (£)</label><input id="fc" inputmode="decimal" value="${w?.cost ?? ''}" placeholder="optional"></div><div><label for="fv">Price type</label><select id="fv"><option value="normal">Standard</option><option value="holo" ${w?.variant === 'holo' ? 'selected' : ''}>Reverse holo</option></select></div>
-    <button class="btn pri" type="submit">${w ? 'Edit on GitHub' : 'Add card'}</button>${w ? '<a class="btn" style="display:inline-flex;align-items:center;justify-content:center;text-decoration:none" target="_blank" rel="noopener" href="' + gh('delete', id) + '">Remove</a>' : ''}</form><p class="notes">Opens GitHub with the card's file ready. Commit it and prices refresh within a few minutes.</p>`;
-  $('#dr').classList.add('open');
-  if (pts.length >= 2) drawLine($('#cfig'), pts, { money: true, ink: 'currentColor', faint: 'rgba(128,128,128,.25)', stroke: '#d42a12', label: r.name + ' price history' });
-  $('#close').onclick = closeCard;
-  $('#wform').onsubmit = (e) => { e.preventDefault(); const n = (v) => v.trim() === '' || isNaN(+v) ? undefined : +v;
-    const body = JSON.stringify({ qty: n($('#fq').value), cost: n($('#fc').value), variant: $('#fv').value === 'holo' ? 'holo' : undefined }, null, 2);
-    window.open(w ? gh('edit', id) : gh('new', id, body), '_blank', 'noopener'); };
-}
-function closeCard() { $('#dr').classList.remove('open'); }
 
 function gh(kind, id, body) {
   const repo = D.latest?.repo || REPO;
@@ -331,53 +430,124 @@ function gh(kind, id, body) {
   return `https://github.com/${repo}/${kind}/main/watch/${encodeURIComponent(id)}.json`;
 }
 
-async function searchDirect(q, fx) {
-  const T = 'https://api.tcgdex.net/v2/en';
-  const p = new URLSearchParams({ name: q, 'sort:field': 'id', 'sort:order': 'DESC', 'pagination:page': '1', 'pagination:itemsPerPage': '18' });
-  const briefs = await (await fetch(`${T}/cards?${p}`)).json();
-  const cards = await Promise.all((briefs || []).slice(0, 18).map((b) => fetch(`${T}/cards/${encodeURIComponent(b.id)}`).then((r) => r.ok ? r.json() : null).catch(() => null)));
-  const r2 = (v) => v > 0 ? Math.round(v * fx * 100) / 100 : null;
-  return cards.filter(Boolean).map((c) => { const cm = c.pricing?.cardmarket || {}; const pick = (k) => cm[k] > 0 ? cm[k] : cm[k + '-holo'] > 0 ? cm[k + '-holo'] : null; const xs = [pick('trend'), pick('avg7'), pick('avg30')].filter(Boolean).sort((a, b) => a - b); const eur = xs.length === 3 ? xs[1] : xs.length === 2 ? (xs[0] + xs[1]) / 2 : xs[0] ?? pick('avg');
-    return { id: c.id, name: c.name, set: c.set?.name || '', number: c.localId, rarity: c.rarity || '', img: c.image ? c.image + '/low.webp' : null, eur, gbp: r2(eur), trend: r2(pick('trend')), low: r2(pick('low')), avg7: r2(pick('avg7')), avg30: r2(pick('avg30')), variant: 'normal' }; })
-    .sort((a, b) => (b.gbp ?? -1) - (a.gbp ?? -1));
+function openCard(id) {
+  const r = recs[id]; if (!r) return;
+  const w = D.watchlist.cards.find((c) => c.id === id);
+  const q = encodeURIComponent(`${r.name} ${r.set || ''} ${r.number || ''}`.trim());
+  const hist = D.history?.cards?.[id];
+  const pts = hist ? D.history.dates.map((d, i) => [d, hist[i]]).filter((p) => p[1] != null) : [];
+  const lad = [['30-day avg', r.avg30], ['7-day avg', r.avg7], ['Yesterday', r.avg1], ['Trend', r.trend], ['Our price', r.gbp]].filter((x) => x[1] != null);
+  const mx = Math.max(...lad.map((x) => x[1]), 1), mn = Math.min(...lad.map((x) => x[1])) * 0.8;
+  $('#panel').innerHTML = `<div class="dhead"><button type="button" class="btn" id="close">Close</button></div>
+    <div class="ph2"><span class="holo">${r.img ? `<img src="${esc(r.img.replace('/low.webp', '/high.webp'))}" alt="${esc(r.name)}">` : ''}</span><div><h2>${esc(r.name)}</h2><p class="sub">${esc(r.set || '')}${r.number ? ' · ' + esc(r.number) : ''}${r.rarity ? ' · ' + esc(r.rarity) : ''}</p><div class="big num" style="font-size:52px">${money(r.gbp)}</div><p class="notes">Median of Cardmarket's trend, 7-day and 30-day prices${r.eur ? ` (€${Number(r.eur).toFixed(2)})` : ''}.</p></div></div>
+    <h3 style="margin-top:18px">Price ladder</h3><div class="ladder">${lad.map(([k, v]) => `<div class="hbar"><span>${k}</span><span class="tr"><i style="width:${Math.max(4, (v - mn) / (mx - mn) * 100)}%;background:${k === 'Our price' ? 'var(--red)' : 'var(--c-blue)'}"></i></span><span class="v">${money(v)}</span></div>`).join('')}</div>
+    ${pts.length >= 2 ? '<h3 style="margin-top:16px">Nightly history</h3><div class="fig s light" id="cfig"></div>' : '<p class="notes">A nightly price line appears once this card has two nights of prices; add it to your cards to track it.</p>'}
+    <div class="links"><a href="https://www.ebay.co.uk/sch/i.html?_nkw=${q}&LH_Sold=1&LH_Complete=1" target="_blank" rel="noopener">eBay UK sold</a><a href="https://www.cardmarket.com/en/Pokemon/Products/Search?searchString=${encodeURIComponent(r.name)}" target="_blank" rel="noopener">Cardmarket</a></div>
+    <h3>${w ? 'In my cards' : 'Add to my cards'}</h3>
+    ${w ? `<p class="notes">${w.qty || 1} owned${w.cost != null ? ', paid ' + money(w.cost) + ' each' : ''}.</p>` : ''}
+    <form class="form" id="wform"><div><label for="fq">Quantity</label><input id="fq" inputmode="numeric" value="${w?.qty ?? ''}" placeholder="1"></div><div><label for="fc">Paid each (£)</label><input id="fc" inputmode="decimal" value="${w?.cost ?? ''}" placeholder="optional"></div><div><label for="fv">Price type</label><select id="fv"><option value="normal">Standard</option><option value="holo" ${w?.variant === 'holo' ? 'selected' : ''}>Reverse holo</option></select></div>
+    <button class="btn pri" type="submit">${w ? 'Edit on GitHub' : 'Add card'}</button>${w ? `<a class="btn" style="display:inline-flex;align-items:center;justify-content:center;text-decoration:none" target="_blank" rel="noopener" href="${gh('delete', id)}">Remove</a>` : ''}</form><p class="notes">Opens GitHub with the card's file ready. Commit it and the next price run picks it up.</p>`;
+  $('#dr').classList.add('open');
+  if (pts.length >= 2) chart($('#cfig'), [{ name: r.name, color: '#c8270f', pts }], { fmt: (v) => money(v), ink: 'currentColor', faint: 'rgba(128,128,128,.22)', dotRing: 'transparent', label: r.name + ' price history' });
+  $('#close').onclick = closeCard; $('#close').focus();
+  $('#wform').onsubmit = (e) => { e.preventDefault(); const n = (v) => v.trim() === '' || isNaN(+v) ? undefined : +v;
+    const body = JSON.stringify({ qty: n($('#fq').value), cost: n($('#fc').value), variant: $('#fv').value === 'holo' ? 'holo' : undefined }, null, 2);
+    window.open(w ? gh('edit', id) : gh('new', id, body), '_blank', 'noopener'); };
 }
+function closeCard() { $('#dr').classList.remove('open'); }
 
-async function search(q) {
-  $('#results').innerHTML = '<p class="empty">Searching Cardmarket prices…</p>';
+// ---- type-ahead search ----
+const norm = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+let sel = -1, opts = [];
+async function names() {
+  if (NAMES) return NAMES;
+  try { const r = await fetch('data/names.json?v=' + (D?.latest?.date || '')); NAMES = (await r.json()).map(([n, c]) => [n, c, norm(n)]); } catch { NAMES = []; }
+  return NAMES;
+}
+async function suggest() {
+  const q = norm($('#q').value.trim()); const ul = $('#sugg');
+  if (q.length < 2) { ul.hidden = true; $('#q').setAttribute('aria-expanded', 'false'); return; }
+  const list = await names();
+  const hits = [];
+  for (const [n, c, k] of list) { const i = k.indexOf(q); if (i < 0) continue; const word = i === 0 ? 0 : /[\s\-'.]/.test(k[i - 1]) ? 1 : 2; hits.push([word, -c, n, c, i]); }
+  hits.sort((a, b) => a[0] - b[0] || a[1] - b[1] || a[2].localeCompare(b[2]));
+  opts = hits.slice(0, 10); sel = -1;
+  if (!opts.length) { ul.innerHTML = `<li aria-disabled="true"><span>No card names contain “${esc($('#q').value.trim())}”</span></li>`; }
+  else ul.innerHTML = opts.map(([, , n, c, i], k) => `<li role="option" id="o${k}" data-k="${k}" aria-selected="false"><span>${esc(n.slice(0, i))}<mark>${esc(n.slice(i, i + q.length))}</mark>${esc(n.slice(i + q.length))}</span><small>${c} card${c === 1 ? '' : 's'}</small></li>`).join('');
+  ul.hidden = false; $('#q').setAttribute('aria-expanded', 'true');
+}
+function pickSugg(k) { const n = opts[k][2]; $('#q').value = n; $('#sugg').hidden = true; $('#q').setAttribute('aria-expanded', 'false'); search(n, true); }
+function highlight() { document.querySelectorAll('#sugg li[role=option]').forEach((li, k) => li.setAttribute('aria-selected', k === sel)); $('#q').setAttribute('aria-activedescendant', sel >= 0 ? 'o' + sel : ''); const li = $('#o' + sel); if (li) li.scrollIntoView({ block: 'nearest' }); }
+
+function priceOf(c, fx) {
+  const cm = c.pricing?.cardmarket || {}; const g = (k) => cm[k] > 0 ? cm[k] : cm[k + '-holo'] > 0 ? cm[k + '-holo'] : null;
+  const xs = [g('trend'), g('avg7'), g('avg30')].filter(Boolean).sort((a, b) => a - b);
+  const eur = xs.length === 3 ? xs[1] : xs.length === 2 ? (xs[0] + xs[1]) / 2 : xs[0] ?? g('avg');
+  const r2 = (v) => v > 0 ? Math.round(v * fx * 100) / 100 : null;
+  return { id: c.id, name: c.name, set: c.set?.name || '', number: c.localId, rarity: c.rarity || '', img: c.image ? c.image + '/low.webp' : null, eur, gbp: r2(eur), trend: r2(g('trend')), avg1: r2(g('avg1')), avg7: r2(g('avg7')), avg30: r2(g('avg30')), low: r2(g('low')) };
+}
+let searchId = 0;
+async function search(q, exact) {
+  const my = ++searchId;
+  $('#results').innerHTML = '<p class="empty">Fetching live prices…</p>';
   try {
-    const fx = D?.latest?.fx?.rate || 0.85; let results;
-    try { const res = await fetch('/api/search?q=' + encodeURIComponent(q) + '&fx=' + fx); if (!res.ok) throw 0; results = (await res.json()).results; }
-    catch { results = await searchDirect(q, fx); }
-    lastResults = results; const j = { results };
-    $('#results').innerHTML = j.results.length ? j.results.map((r) => cardRow(r)).join('') : '<p class="empty">No cards found. Try the Pokémon name only.</p>';
+    const fx = D?.latest?.fx?.rate || 0.85;
+    const p = new URLSearchParams({ name: exact ? 'eq:' + q : q, 'pagination:page': '1', 'pagination:itemsPerPage': '80' });
+    const briefs = await (await fetch(`${T}/cards?${p}`)).json();
+    const list = Array.isArray(briefs) ? briefs : [];
+    // Prefer cards we already know are valuable, then newest sets.
+    const known = (id) => recs[id]?.gbp || 0;
+    list.sort((a, b) => known(b.id) - known(a.id));
+    const take = list.slice(0, 40); const out = [];
+    for (let i = 0; i < take.length; i += 10) {
+      const part = await Promise.all(take.slice(i, i + 10).map((b) => fetch(`${T}/cards/${encodeURIComponent(b.id)}`).then((r) => r.ok ? r.json() : null).catch(() => null)));
+      if (my !== searchId) return;
+      out.push(...part.filter(Boolean).map((c) => priceOf(c, fx)));
+      out.sort((a, b) => (b.gbp ?? -1) - (a.gbp ?? -1));
+      for (const r of out) if (!recs[r.id] || !recs[r.id].inIndex) recs[r.id] = { ...recs[r.id], ...r };
+      $('#results').innerHTML = `<p class="notes">${list.length} card${list.length === 1 ? '' : 's'} match${list.length > 40 ? `; showing ${out.length} priced so far, most valuable first` : ''}.</p>` + out.map((r) => cardRow(r)).join('');
+    }
+    if (!list.length) $('#results').innerHTML = '<p class="empty">No cards found. Try part of the Pokémon name.</p>';
   } catch (e) { $('#results').innerHTML = '<p class="empty">Search failed: ' + esc(e.message) + '</p>'; }
 }
 
 function renderAll() {
   recs = Object.fromEntries((D.latest?.records || []).map((r) => [r.id, r]));
   const L = D.latest;
-  $('#meta').textContent = L ? `Updated ${dfmt(L.date)} · €1 = £${L.fx.rate.toFixed(3)} · Cardmarket via TCGdex` : 'Waiting for the first nightly update';
-  renderBoard(); renderWatch(); renderMovers();
+  $('#meta').textContent = L ? `Updated ${dfmtY(L.date)} · €1 = £${L.fx.rate.toFixed(3)} · Cardmarket via TCGdex` : 'Waiting for the first nightly update';
+  if (!L) return;
+  renderBoard(); renderFan(); renderPulse(); renderWatch(); renderMovers();
 }
 
-async function load(quiet) {
+async function load() {
   try {
     const v = '?v=' + Math.floor(Date.now() / 3e5);
     const [latest, history] = await Promise.all(['latest', 'history'].map((n) => fetch('data/' + n + '.json' + v).then((r) => r.ok ? r.json() : null)));
     D = { latest, history, watchlist: latest?.watchlist || { cards: [] } }; renderAll();
-  }
-  catch (e) { $('#meta').textContent = 'Could not load prices: ' + e.message; }
+  } catch (e) { $('#meta').textContent = 'Could not load prices: ' + e.message; }
 }
 
 document.addEventListener('click', (e) => {
-  const t = e.target.closest('[data-id],[data-seg],[data-r]'); if (!t) { if (e.target.id === 'dr') closeCard(); return; }
+  const li = e.target.closest('#sugg li[data-k]'); if (li) { pickSugg(+li.dataset.k); return; }
+  if (!e.target.closest('#sform')) $('#sugg').hidden = true;
+  const t = e.target.closest('[data-id],[data-seg],[data-r],[data-mode]'); if (!t) { if (e.target.id === 'dr') closeCard(); return; }
   if (t.dataset.id) { e.preventDefault(); openCard(t.dataset.id); }
   else if (t.dataset.seg) { seg = t.dataset.seg; renderBoard(); }
-  else if (t.dataset.r) { range = t.dataset.r; store.set('range', range); renderBoard(); }
+  else if (t.dataset.r) { range = t.dataset.r; ls.set('range', range); renderBoard(); }
+  else if (t.dataset.mode) { mode = t.dataset.mode; ls.set('mode', mode); renderBoard(); }
 });
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeCard(); });
-$('#sform').onsubmit = (e) => { e.preventDefault(); const q = $('#q').value.trim(); if (q.length > 1) search(q); };
-if (window.__DATA__) { D = window.__DATA__; renderAll(); } else load();
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeCard(); $('#sugg').hidden = true; } });
+let tmr; $('#q').addEventListener('input', () => { clearTimeout(tmr); tmr = setTimeout(suggest, 60); });
+$('#q').addEventListener('focus', () => { names(); if ($('#q').value.trim().length > 1) suggest(); });
+$('#q').addEventListener('keydown', (e) => {
+  if ($('#sugg').hidden || !opts.length) return;
+  if (e.key === 'ArrowDown') { e.preventDefault(); sel = (sel + 1) % opts.length; highlight(); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); sel = (sel - 1 + opts.length) % opts.length; highlight(); }
+  else if (e.key === 'Enter' && sel >= 0) { e.preventDefault(); pickSugg(sel); }
+});
+$('#sform').onsubmit = (e) => { e.preventDefault(); const q = $('#q').value.trim(); $('#sugg').hidden = true; if (q.length > 1) search(q, false); };
+addEventListener('resize', () => { if (D?.latest) renderFan(); });
+load();
 }
 </script>
 </body>
