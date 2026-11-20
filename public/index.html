@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>UK Pokémon Card Index</title>
-<meta name="theme-color" content="#c8270f">
+<meta name="theme-color" content="#0f380f">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=Inter:wght@400;500;600&family=Pixelify+Sans:wght@600&display=swap" rel="stylesheet">
 <style>
 /* VOICE: a card shop's daily price board: brisk, numeric, collector-friendly.
    IDEA: the board above the counter, with the most valuable cards fanned out in the window.
@@ -31,10 +31,16 @@ button{cursor:pointer}
 .sub{color:var(--mute);margin:0 0 16px;max-width:68ch}
 .up{color:var(--up)}.down{color:var(--down)}
 /* board */
-.board{background:linear-gradient(160deg,var(--red),var(--red2));color:#fff;position:relative;overflow:hidden}
-.board::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(135deg,rgba(255,255,255,.035) 0 2px,transparent 2px 14px);pointer-events:none}
+.board{--g0:#cadc9f;--g1:#8bac0f;--g2:#306230;--g3:#0f380f;background:var(--g3);color:var(--g0);position:relative;overflow:hidden}
+#world{position:absolute;left:0;top:0;image-rendering:pixelated;image-rendering:crisp-edges;pointer-events:none}
 .board .wrap{position:relative}
-.board .up{color:#c9ffd9}.board .down{color:#fff1a8}
+.board .up{color:#b8f27a}.board .down{color:#ffb39e}
+.board h1{font-family:'Pixelify Sans',Archivo,sans-serif;font-stretch:normal;font-weight:600;color:var(--g3);letter-spacing:.01em}
+.board .hero,.board .top{color:var(--g3)}
+.board .meta,.board .seglabel,.board .stat,.board .fancap{color:var(--g3)}
+.board .seglabel .dot{box-shadow:0 0 0 2px var(--g3)}
+.board .chip{background:var(--g3);color:var(--g0)}
+.lane{position:relative;margin-top:14px}
 .top{display:flex;flex-wrap:wrap;gap:8px 20px;align-items:baseline;justify-content:space-between}
 .meta{font-size:14px;color:#ffe0d9}
 .hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,420px);gap:20px 36px;margin-top:18px;align-items:center}
@@ -47,9 +53,9 @@ button{cursor:pointer}
 .stat{margin-top:12px;font-size:14px;color:#ffe0d9}
 /* card fan */
 .fan{position:relative;height:250px}
-.fan button{position:absolute;bottom:0;left:50%;width:clamp(84px,11vw,132px);aspect-ratio:63/88;border:0;padding:0;background:#0003;border-radius:6px;transform-origin:50% 120%;box-shadow:0 10px 24px rgba(0,0,0,.35);transition:transform .25s ease}
+.fan button{position:absolute;bottom:0;left:50%;width:clamp(84px,11vw,132px);aspect-ratio:63/88;border:0;padding:0;background:#30623055;border-radius:6px;transform-origin:50% 120%;box-shadow:4px 6px 0 rgba(15,56,15,.45);transition:transform .25s ease}
 .fan button img{width:100%;height:100%;object-fit:cover;border-radius:6px;display:block}
-.fan .tag{position:absolute;left:50%;bottom:-6px;transform:translate(-50%,100%);background:#fff;color:var(--red2);font:700 13px/1 Archivo,sans-serif;font-stretch:85%;padding:4px 7px;border-radius:5px;white-space:nowrap;opacity:0;transition:opacity .2s}
+.fan .tag{position:absolute;left:50%;bottom:-6px;transform:translate(-50%,100%);background:#0f380f;color:#cadc9f;font:700 13px/1 Archivo,sans-serif;font-stretch:85%;padding:4px 7px;border-radius:5px;white-space:nowrap;opacity:0;transition:opacity .2s}
 .fan button:hover .tag,.fan button:focus-visible .tag{opacity:1}
 .fancap{text-align:center;font-size:13px;color:#ffe0d9;margin-top:30px}
 /* holo foil */
@@ -57,27 +63,27 @@ button{cursor:pointer}
 .holo::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(115deg,transparent 25%,rgba(255,255,255,.5) 38%,rgba(255,60,200,.28) 44%,rgba(40,220,255,.28) 51%,rgba(255,240,90,.3) 58%,transparent 72%);background-size:260% 260%;background-position:100% 100%;mix-blend-mode:color-dodge;opacity:.35}
 @media(prefers-reduced-motion:no-preference){.holo:hover::after,.holo:focus-visible::after{animation:foil 1.6s ease-in-out infinite alternate;opacity:.9}@keyframes foil{from{background-position:100% 100%}to{background-position:0 0}}.line-anim{stroke-dasharray:5000;stroke-dashoffset:5000;animation:draw 1.2s ease-out forwards}@keyframes draw{to{stroke-dashoffset:0}}}
 /* chart controls */
-.ctrl{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;justify-content:space-between;margin:22px 0 8px}
+.ctrl{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;justify-content:space-between;margin:18px 0 8px}
 .tabs{display:flex;flex-wrap:wrap;gap:6px}
-.tab{min-height:38px;padding:5px 13px;border-radius:999px;border:1px solid rgba(255,255,255,.45);background:transparent;color:#fff;font-size:14px;display:inline-flex;align-items:center;gap:6px}
+.tab{min-height:38px;padding:5px 13px;border-radius:999px;border:1px solid rgba(202,220,159,.45);background:transparent;color:#cadc9f;font-size:14px;display:inline-flex;align-items:center;gap:6px}
 .tab:disabled{opacity:.4;cursor:not-allowed}
-.tab[aria-pressed=true]{background:#fff;color:var(--red2);border-color:#fff;font-weight:600}
+.tab[aria-pressed=true]{background:#cadc9f;color:#0f380f;border-color:#cadc9f;font-weight:600}
 .fig{position:relative;min-height:320px}.fig>svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 .fig.s{min-height:220px}.fig.xs{min-height:150px}
 .tip{position:absolute;pointer-events:none;background:#111;color:#fff;padding:6px 9px;border-radius:6px;font-size:13px;line-height:1.35;white-space:nowrap;transform:translate(-50%,-112%);display:none;z-index:2}
-.chartnote{font-size:13px;color:#ffe0d9;margin:6px 0 0}
+.chartnote{font-size:13px;color:#a9be7f;margin:6px 0 0}
 .cardnote{font-size:13px;color:var(--mute);margin:6px 0 0}
 .early{background:rgba(0,0,0,.18);border-radius:12px;padding:16px;min-height:300px}
-.early p{margin:0 0 12px;color:#ffe9e4;font-size:15px;max-width:72ch}
+.early p{margin:0 0 12px;color:#cadc9f;font-size:15px;max-width:72ch}
 .mrow{display:grid;grid-template-columns:130px minmax(0,1fr) 64px;gap:10px;align-items:center;margin:12px 0;font-size:15px}
 .mbar{height:12px;background:rgba(255,255,255,.18);border-radius:6px;position:relative}
 .mbar i{position:absolute;top:0;bottom:0;border-radius:6px}
 .mbar .mid{position:absolute;left:50%;top:-4px;bottom:-4px;width:2px;background:rgba(255,255,255,.8)}
 .tiles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:18px}
-.tile{background:rgba(0,0,0,.2);border:0;color:#fff;text-align:left;border-radius:12px;padding:12px;min-height:44px;border-top:4px solid var(--c)}
-.tile[aria-pressed=true]{outline:2px solid #fff}
+.tile{background:rgba(202,220,159,.07);border:0;color:#cadc9f;text-align:left;border-radius:12px;padding:12px;min-height:44px;border-top:4px solid var(--c)}
+.tile[aria-pressed=true]{outline:2px solid #cadc9f}
 .tile .n{font-size:26px;font-weight:700;line-height:1.1;display:block}
-.tile small{display:block;color:#ffe0d9;font-size:13px}
+.tile small{display:block;color:#a9be7f;font-size:13px}
 /* sheet */
 .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(18px,3vw,40px)}
 .panel-c{background:var(--card);border-radius:14px;padding:16px}
@@ -153,6 +159,7 @@ details summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;alig
 </head>
 <body>
 <section class="band board">
+  <canvas id="world" aria-hidden="true"></canvas>
   <div class="wrap">
     <div class="top"><h1>UK Pokémon Card Index</h1><div class="meta" id="meta">Loading prices…</div></div>
     <div class="hero">
@@ -164,6 +171,7 @@ details summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;alig
       </div>
       <div><div class="fan" id="fan" aria-label="Most valuable blue-chip cards"></div><div class="fancap" id="fancap"></div></div>
     </div>
+    <div class="lane" id="lane" aria-hidden="true"></div>
     <div class="ctrl"><div class="tabs" id="ranges"></div><div class="tabs" id="modes"></div></div>
     <div id="chartbox"></div>
     <p class="chartnote" id="chartnote"></p>
@@ -377,7 +385,7 @@ function renderBoard() {
     if (mode === 'compare') {
       const series = SEGS.map(([key, nm, , col]) => { const pts = segSeries(key).filter((p) => tms(p[0]) >= cut); const b = pts[0]?.[1]; return { name: nm, color: col, pts: pts.map((p) => [p[0], b ? (p[1] / b - 1) * 100 : null, p[2]]) }; });
       chart(box, series, { label: 'Index groups compared', fmt: (v) => pct(v, 1), zero: 0, estLabel: (i, ref) => estLabel(i, ref, anchorEst) });
-    } else chart(box, [{ name, color: '#ffcc00', pts: segSeries(seg).filter((p) => tms(p[0]) >= cut) }], { label: name + ' index', estLabel: (i, ref) => estLabel(i, ref, anchorEst) });
+    } else chart(box, [{ name, color: '#cadc9f', pts: segSeries(seg).filter((p) => tms(p[0]) >= cut) }], { label: name + ' index', estLabel: (i, ref) => estLabel(i, ref, anchorEst) });
     const hasEst = segSeries(seg).some((p) => p[2]);
     $('#chartnote').textContent = (hasEst ? `Dashed: estimated from Cardmarket's 30-day and 7-day averages, placed mid-window. Solid: the nightly index, from ${dfmt(dates[0])}. ` : '') + (RANGES.some(([, d]) => d && !usable(d)) ? `The chart covers ${Math.round(spanDays)} days so far; longer ranges switch on as nightly history builds.` : '');
   } else {
@@ -610,6 +618,111 @@ addEventListener('resize', () => { if (D?.latest) renderFan(); });
 $('#wsort').onchange = (e) => { wsort = e.target.value; ls.set('wsort', wsort); renderWatch(); };
 load();
 }
+</script>
+<script>
+// ---- Pixel world: an original Game Boy-style scene drawn on a canvas behind the board ----
+(() => {
+  const board = document.querySelector('.board'), lane = document.getElementById('lane'), cv = document.getElementById('world');
+  if (!board || !lane || !cv) return;
+  const ctx = cv.getContext('2d');
+  const P = { 0: '#cadc9f', 1: '#8bac0f', 2: '#306230', 3: '#0f380f', w: '#eef6d6' };
+  const SKY = P[0], LH = 54; // lane height in art pixels
+  const sprite = (rows) => { const c = document.createElement('canvas'); c.width = rows[0].length; c.height = rows.length; const g = c.getContext('2d'); rows.forEach((r, y) => [...r].forEach((ch, x) => { if (P[ch]) { g.fillStyle = P[ch]; g.fillRect(x, y, 1, 1); } })); return c; };
+  // Walker: an original explorer with a wide-brim hat, scarf and backpack (16x16, facing right).
+  const top = [
+    '......33333.....',
+    '.....3222223....',
+    '.....3222223....',
+    '...33333333333..',
+    '.....33000003...',
+    '.....33000303...',
+    '.....330000003..',
+    '......3300003...',
+    '...2222222......',
+    '..2323111133....',
+    '...323111113....',
+    '...333111333....'];
+  const legsA = ['......3113......', '.....31..13.....', '....31....13....', '....33....33....'];
+  const legsP = ['......3113......', '......3113......', '......3123......', '......3333......'];
+  const legsB = ['......3113......', '.....32..13.....', '....32....13....', '....33....33....'];
+  const topSwing = top.map((r, i) => i === 10 ? '...3231111103...' : i === 11 ? '...33311133.3...' : r);
+  const frames = [sprite([...top, ...legsA]), sprite(['................', ...topSwing, ...legsP.slice(0, 3)]), sprite([...topSwing, ...legsB]), sprite(['................', ...top, ...legsP.slice(0, 3)])];
+  const tree = sprite([
+    '.....333333.....', '...3322222233...', '..322211222223..', '.32221112222223.', '.32211122222223.', '3222111222222223', '3222222222212223', '3222222222112223', '.32222222211223.', '.32222222222223.', '..322222222223..', '...3322222233...', '.....333333.....', '......3113......', '......3113......', '......3123......', '.....331233.....']);
+  const bush = sprite(['..33333...', '.3221123..', '322211223.', '3222222233', '.33333333.']);
+  const flowerA = sprite(['.0.', '030', '.0.', '.2.']), flowerB = sprite(['0..', '30.', '0..', '.2.']);
+  const tuft = sprite(['2.2.2', '.222.']);
+  // Seeded layout on a repeating loop.
+  let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const LOOP = 1800;
+  const mid = []; for (let x = 10; x < LOOP - 60;) { const r = rnd(); if (r < .32) { mid.push({ t: 'tree', x }); x += 18 + rnd() * 22; } else if (r < .46) { mid.push({ t: 'house', x, v: rnd() }); x += 44 + rnd() * 20; } else if (r < .6) { const n = 2 + Math.floor(rnd() * 4); mid.push({ t: 'fence', x, n }); x += n * 6 + 10; } else if (r < .66) { mid.push({ t: 'sign', x }); x += 18; } else if (r < .8) { mid.push({ t: 'bush', x }); x += 14; } else x += 20 + rnd() * 30; }
+  const far = []; for (let x = 0; x < LOOP;) { far.push({ x, h: 4 + rnd() * 5, r: 3 + rnd() * 3 }); x += 7 + rnd() * 12; }
+  const clouds = []; for (let x = 0; x < LOOP;) { clouds.push({ x, y: rnd(), w: 14 + rnd() * 18 }); x += 60 + rnd() * 120; }
+  const deco = []; for (let x = 0; x < LOOP;) { deco.push({ x, t: rnd() < .45 ? 'flower' : 'tuft', row: rnd() < .5 ? 0 : 1 }); x += 3 + rnd() * 9; }
+  let S = 4, W = 0, H = 0, laneTop = 0, tick = 0, running = true;
+  function size() {
+    S = innerWidth < 600 ? 3 : 4;
+    lane.style.height = LH * S + 'px';
+    const b = board.getBoundingClientRect(), l = lane.getBoundingClientRect();
+    const hpx = l.bottom - b.top;
+    W = Math.ceil(b.width / S); H = Math.ceil(hpx / S); laneTop = H - LH;
+    cv.width = W; cv.height = H; cv.style.width = W * S + 'px'; cv.style.height = H * S + 'px';
+    draw();
+  }
+  const wrap = (x, off) => { let p = (x - off) % LOOP; if (p < -60) p += LOOP; return p; };
+  function house(x, y, v) {
+    const w = 34, wallH = 15, roofH = 11, gy = y - wallH - roofH;
+    ctx.fillStyle = P[3]; ctx.fillRect(x + w - 9, gy - 4, 4, 6); // chimney
+    for (let r = 0; r < roofH; r++) { const inset = Math.round((roofH - 1 - r) * 0.45); ctx.fillStyle = r === 0 || r % 3 === 2 ? P[3] : P[2]; ctx.fillRect(x - 1 + inset, gy + r, w + 2 - inset * 2, 1); }
+    ctx.fillStyle = P[3]; ctx.fillRect(x, gy + roofH, w, wallH);
+    ctx.fillStyle = v > .5 ? P[0] : P['w']; ctx.fillRect(x + 1, gy + roofH, w - 2, wallH - 1);
+    ctx.fillStyle = P[3]; ctx.fillRect(x + 14, y - 9, 6, 9); ctx.fillStyle = P[1]; ctx.fillRect(x + 18, y - 5, 1, 1);
+    for (const wx of [x + 4, x + 24]) { ctx.fillStyle = P[3]; ctx.fillRect(wx, y - 12, 6, 6); ctx.fillStyle = P[2]; ctx.fillRect(wx + 1, y - 11, 4, 4); ctx.fillStyle = P[0]; ctx.fillRect(wx + 1, y - 9, 4, 1); ctx.fillRect(wx + 3, y - 11, 1, 4); }
+  }
+  function draw() {
+    if (!W) return;
+    const gx = tick; // ground scroll in art px
+    ctx.fillStyle = SKY; ctx.fillRect(0, 0, W, H);
+    // clouds drift slowly
+    for (const c of clouds) { const x = Math.round(wrap(c.x, gx * 0.15 + tick * 0.05)); if (x > W + 40) continue; const y = Math.round(4 + c.y * Math.max(8, laneTop * 0.55)); ctx.fillStyle = P.w; ctx.fillRect(x + 4, y, c.w - 10, 1); ctx.fillRect(x + 2, y + 1, c.w - 5, 1); ctx.fillRect(x, y + 2, c.w, 2); ctx.fillRect(x + 1, y + 4, c.w - 2, 1); }
+    // far trees on a low ridge, just above the lane
+    // distant tree line: rounded crowns, checker-dithered so they read as far away
+    const ridge = laneTop + 16;
+    ctx.fillStyle = P[1]; ctx.fillRect(0, ridge, W, LH);
+    for (const f of far) { const cx0 = Math.round(wrap(f.x, gx * 0.3)); if (cx0 > W + 10 || cx0 < -10) continue; const r = Math.round(f.r), cy = ridge - Math.round(f.h * 0.5);
+      for (let yy = -r; yy <= r; yy++) for (let xx = -r; xx <= r; xx++) { if (xx * xx + yy * yy > r * r + r * 0.6) continue; const px = cx0 + xx, py = cy + yy; if (py > ridge) continue; ctx.fillStyle = ((px + py) & 1) && yy < 0 ? P[0] : P[1]; ctx.fillRect(px, py, 1, 1); }
+      ctx.fillRect(cx0, cy + r, 1, ridge - cy - r + 1); }
+    // ground: grass, path, grass
+    const gTop = laneTop + 30, pathTop = gTop + 6, pathBot = pathTop + 11;
+    ctx.fillStyle = P[1]; ctx.fillRect(0, ridge + 1, W, LH);
+    ctx.fillStyle = P[0]; ctx.fillRect(0, pathTop, W, pathBot - pathTop);
+    ctx.fillStyle = P[1]; for (let x = -(gx % 8); x < W; x += 8) { ctx.fillRect(x + 1, pathTop + 3, 1, 1); ctx.fillRect(x + 5, pathTop + 7, 1, 1); ctx.fillRect(x + 3, pathTop, 2, 1); ctx.fillRect(x + 6, pathBot - 1, 2, 1); }
+    // mid layer: trees, houses, fences, signs, bushes standing on the grass behind the path
+    const base = pathTop;
+    for (const o of mid) {
+      const x = Math.round(wrap(o.x, gx * 0.75)); if (x > W + 40 || x < -50) continue;
+      if (o.t === 'tree') ctx.drawImage(tree, x, base - 17);
+      else if (o.t === 'bush') ctx.drawImage(bush, x, base - 5);
+      else if (o.t === 'house') house(x, base, o.v);
+      else if (o.t === 'fence') { ctx.fillStyle = P[2]; ctx.fillRect(x, base - 5, o.n * 6 + 1, 1); ctx.fillRect(x, base - 3, o.n * 6 + 1, 1); ctx.fillStyle = P[3]; for (let i = 0; i <= o.n; i++) ctx.fillRect(x + i * 6, base - 7, 1, 7); }
+      else if (o.t === 'sign') { ctx.fillStyle = P[3]; ctx.fillRect(x + 4, base - 4, 1, 4); ctx.fillRect(x, base - 10, 9, 6); ctx.fillStyle = P[0]; ctx.fillRect(x + 1, base - 9, 7, 4); ctx.fillStyle = P[2]; ctx.fillRect(x + 2, base - 8, 5, 1); ctx.fillRect(x + 2, base - 6, 3, 1); }
+    }
+    // foreground decoration on the grass strips
+    for (const d of deco) { const x = Math.round(wrap(d.x, gx)); if (x > W + 6) continue; const y = d.row ? pathBot + 2 + (d.x % 4) : gTop + 1 + (d.x % 3);
+      if (d.t === 'flower') ctx.drawImage((tick >> 3) % 2 ? flowerA : flowerB, x, y); else ctx.drawImage(tuft, x, y + 1); }
+    // walker
+    const f = frames[(tick >> 2) % 4], cx = Math.round(W * (innerWidth < 600 ? 0.22 : 0.16));
+    ctx.fillStyle = P[1]; ctx.fillRect(cx + 4, pathTop + 9, 8, 1);
+    ctx.drawImage(f, cx, pathTop - 6);
+  }
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let last = 0;
+  function loop(t) { if (running && t - last > 80) { last = t; tick++; draw(); } requestAnimationFrame(loop); }
+  new ResizeObserver(size).observe(board);
+  addEventListener('resize', size);
+  if (!still) { new IntersectionObserver((e) => { running = e[0].isIntersecting && !document.hidden; }).observe(cv); document.addEventListener('visibilitychange', () => { running = !document.hidden; }); requestAnimationFrame(loop); }
+  size();
+})();
 </script>
 </body>
 </html>
