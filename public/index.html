@@ -147,7 +147,44 @@ td.r,th.r{text-align:right;white-space:nowrap}
 details summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;align-items:center}
 .notes{font-size:14px;color:var(--mute)}
 .method p{max-width:72ch}
-.dr{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;z-index:9}
+.dr{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;z-index:30}
+.playbtn{background:#fbfaf2;border:3px solid #39486a;color:#1f2a1c;font-family:'Pixelify Sans',Inter,sans-serif;font-size:17px}
+body.town{overflow:hidden}
+body.town>section.band{display:none}
+#town{position:fixed;inset:0;z-index:10;background:#24602a;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none}
+#towncv{display:block;image-rendering:pixelated;image-rendering:crisp-edges;outline:none}
+.tdlg,.tbanner,.pcwin{font-family:'Pixelify Sans',Inter,sans-serif}
+.tdlg{position:absolute;left:50%;bottom:max(18px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(760px,calc(100% - 24px));background:#fbfaf2;color:#1f2a1c;border:4px solid #39486a;border-radius:12px;box-shadow:inset 0 0 0 3px #fbfaf2,inset 0 0 0 5px #b6c2dc,0 6px 0 rgba(0,0,0,.3);padding:16px 22px;font-size:clamp(17px,2.2vw,22px);line-height:1.4}
+.tdlg b{color:#39486a;letter-spacing:.03em}
+.tmore{position:absolute;right:16px;bottom:8px;font-size:14px;color:#c8270f;animation:bob 1s steps(2) infinite}
+@keyframes bob{50%{transform:translateY(3px)}}
+.tbanner{position:absolute;left:16px;top:16px;background:#fbfaf2;color:#1f2a1c;border:3px solid #39486a;border-radius:8px;padding:6px 14px;font-size:20px;box-shadow:0 4px 0 rgba(0,0,0,.3)}
+.thud{position:absolute;right:14px;top:14px;min-height:40px;padding:6px 12px;border-radius:8px;border:3px solid #39486a;background:#fbfaf2;color:#1f2a1c;font:600 14px Inter,sans-serif;opacity:.9}
+.thelp{position:absolute;left:16px;bottom:16px;color:#fff;font:500 13px Inter,sans-serif;background:rgba(20,30,15,.55);padding:5px 10px;border-radius:6px}
+.tpad{display:none}
+@media (pointer:coarse),(max-width:900px){
+ .thelp{display:none}
+ .tpad{display:block}
+ .tdlg{bottom:calc(184px + env(safe-area-inset-bottom))}
+ .dpad{position:absolute;left:18px;bottom:calc(22px + env(safe-area-inset-bottom));width:150px;height:150px}
+ .dpad button,.ab button{position:absolute;border:0;color:#fbfaf2;background:rgba(31,42,28,.72);box-shadow:0 4px 0 rgba(0,0,0,.35);font-size:18px;touch-action:none}
+ .dpad button{width:52px;height:52px;border-radius:10px}
+ .dpad .u{left:49px;top:0}.dpad .d{left:49px;bottom:0}.dpad .l{left:0;top:49px}.dpad .r{right:0;top:49px}
+ .ab .a,.ab .b{width:64px;height:64px;border-radius:50%;font:700 22px 'Pixelify Sans',Inter,sans-serif}
+ .ab .a{right:18px;bottom:calc(70px + env(safe-area-inset-bottom));background:rgba(200,39,15,.85)}
+ .ab .b{right:92px;bottom:calc(30px + env(safe-area-inset-bottom));background:rgba(57,72,106,.85)}
+}
+.pcwin{position:fixed;inset:max(2vh,10px) max(3vw,10px);z-index:20;background:var(--bg);border:4px solid #39486a;border-radius:14px;box-shadow:0 0 0 4px #fbfaf2,0 18px 50px rgba(0,0,0,.45);display:flex;flex-direction:column;overflow:hidden}
+.pcwin[hidden],#town[hidden]{display:none}
+.pchead{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 14px;background:#39486a;color:#fff}
+.pctitle{font-size:22px}
+.pchead .btn{min-height:40px;font-family:Inter,sans-serif}
+.pchead .btn .notes{color:var(--mute)}
+.pcbody{overflow:auto;flex:1;-webkit-overflow-scrolling:touch}
+.pcbody>div:not(.band){padding:clamp(18px,3vw,36px) max(4vw,16px)}
+.pcbody>section.band{padding-top:clamp(18px,3vw,36px)!important}
+.pcbody #world,.pcbody .lane,.pcbody .playbtn{display:none}
+.setrow2{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;padding:14px 0;border-bottom:1px solid var(--line)}
 .dr.open{display:block}
 .panel{position:absolute;right:0;top:0;bottom:0;width:min(540px,100%);background:var(--bg);overflow-y:auto;padding:18px max(4vw,16px) 40px}
 .dhead{display:flex;justify-content:flex-end;margin-bottom:6px}
@@ -166,10 +203,10 @@ details summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;alig
 </style>
 </head>
 <body>
-<section class="band board">
+<section class="band board" id="sec-index">
   <canvas id="world" aria-hidden="true"></canvas>
   <div class="wrap">
-    <div class="top"><div class="dlg"><h1>UK Pokémon Card Index</h1><div class="meta" id="meta">Loading prices…</div></div></div>
+    <div class="top"><div class="dlg"><h1>UK Pokémon Card Index</h1><div class="meta" id="meta">Loading prices…</div></div><button type="button" class="btn playbtn" id="playTown">Play Index Town</button></div>
     <div class="hero">
       <div class="dlg">
         <div class="seglabel" id="seglabel"></div>
@@ -187,7 +224,7 @@ details summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;alig
   </div>
 </section>
 
-<section class="band">
+<section class="band" id="sec-pulse">
   <div class="wrap">
     <h2>Market pulse</h2>
     <p class="sub" id="pulsesub"></p>
@@ -201,13 +238,13 @@ details summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;alig
 
 <section class="band" style="padding-top:0">
   <div class="wrap cols">
-    <div>
+    <div id="sec-mine">
       <div class="head"><h2>My cards</h2><label class="sortl">Sort <select id="wsort"><option value="value">Value</option><option value="set">Set</option><option value="mom">7d/30d move</option><option value="name">Name</option></select></label></div>
       <div class="total" id="totals"></div>
       <div id="pfchart"></div>
       <div id="watch"></div>
     </div>
-    <div>
+    <div id="sec-find">
       <h2>Find a card</h2>
       <p class="sub">Start typing a name and pick from the list. Prices are live from Cardmarket, in pounds.</p>
       <form class="search" id="sform" autocomplete="off" role="search">
@@ -220,7 +257,7 @@ details summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;alig
   </div>
 </section>
 
-<section class="band" style="padding-top:0">
+<section class="band" style="padding-top:0" id="sec-movers">
   <div class="wrap">
     <h2>Biggest moves</h2>
     <p class="sub" id="movsub"></p>
@@ -228,9 +265,9 @@ details summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;alig
   </div>
 </section>
 
-<section class="band" style="padding-top:0">
+<section class="band" style="padding-top:0" id="sec-museum">
   <div class="wrap">
-    <details><summary><span>Blue-chip cards (<span id="ccount">0</span>)</span></summary>
+    <details open><summary><span>Blue-chip cards (<span id="ccount">0</span>)</span></summary>
       <div class="scroll"><table><thead><tr><th>Card</th><th class="hide-s">Group</th><th class="r">Price</th><th class="r hide-s">Trend</th><th class="r">7d vs 30d</th></tr></thead><tbody id="ctable"></tbody></table></div>
     </details>
     <div class="method">
@@ -243,6 +280,21 @@ details summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;alig
   </div>
 </section>
 
+<div id="town" hidden>
+  <canvas id="towncv" tabindex="0" aria-label="Index Town. Use the arrow keys to walk and Enter to read signs and use computers."></canvas>
+  <div class="tbanner" id="tbanner" hidden></div>
+  <button type="button" class="thud" id="toClassicHud">Classic view</button>
+  <div class="thelp" aria-hidden="true">Arrows / WASD walk · Enter use · Esc close</div>
+  <div class="tdlg" id="tdlg" role="status" aria-live="polite" hidden></div>
+  <div class="tpad" id="tpad" aria-hidden="true">
+    <div class="dpad"><button type="button" data-d="UP" class="u">▲</button><button type="button" data-d="LEFT" class="l">◀</button><button type="button" data-d="RIGHT" class="r">▶</button><button type="button" data-d="DOWN" class="d">▼</button></div>
+    <div class="ab"><button type="button" id="tbtnB" class="b">B</button><button type="button" id="tbtnA" class="a">A</button></div>
+  </div>
+</div>
+<div class="pcwin" id="pcwin" role="dialog" aria-modal="true" aria-labelledby="pctitle" hidden>
+  <div class="pchead"><span class="pctitle" id="pctitle">PC</span><button type="button" class="btn" id="pcclose">Close <span class="notes">(B / Esc)</span></button></div>
+  <div class="pcbody" id="pcbody"></div>
+</div>
 <div class="dr" id="dr" role="dialog" aria-modal="true" aria-label="Card detail"><div class="panel" id="panel"></div></div>
 
 <script>
@@ -623,6 +675,10 @@ $('#q').addEventListener('keydown', (e) => {
 });
 $('#sform').onsubmit = (e) => { e.preventDefault(); const q = $('#q').value.trim(); $('#sugg').hidden = true; if (q.length > 1) search(q, false); };
 addEventListener('resize', () => { if (D?.latest) renderFan(); });
+window.__townData = () => D || {};
+window.__townFmt = { money };
+window.__setView = (v) => { ls.set('view', v); document.body.classList.toggle('town', v === 'town'); if (window.IndexTown) { if (v === 'town') IndexTown.start(); else IndexTown.stop(); } if (v === 'classic') { scrollTo(0, 0); setTimeout(() => dispatchEvent(new Event('resize')), 50); } };
+$('#playTown').onclick = () => window.__setView('town');
 $('#wsort').onchange = (e) => { wsort = e.target.value; ls.set('wsort', wsort); renderWatch(); };
 load();
 }
@@ -821,6 +877,367 @@ load();
   if (!still) { new IntersectionObserver((e) => { running = e[0].isIntersecting && !document.hidden; }).observe(cv); document.addEventListener('visibilitychange', () => { running = !document.hidden; }); requestAnimationFrame(loop); }
   build();
 })();
+</script>
+<script>
+// ---- Index Town: a playable top-down town. Each building opens a section of the tracker. ----
+window.IndexTown = (() => {
+  const T = 16, gba = true, dmg = false;
+  const SPR = {"DOWN": ["....oooooooo....", "...ohhhhhhhho...", "..ohwhhhhhhhho..", ".oHHHHHHHHHHHHo.", "..oossssssssoo..", "...osesssseso...", "...osssssssso...", "....occcccco....", "...ojjccccjjo...", "..osjjjjjjjjso..", "..osjJjjjjJjso..", "...ojJjjjjJjo...", "....oppppppo....", "....opo..opo....", "....oBo..oBo....", "....ooo..ooo...."], "DOWN_A": ["....oooooooo....", "...ohhhhhhhho...", "..ohwhhhhhhhho..", ".oHHHHHHHHHHHHo.", "..oossssssssoo..", "...osesssseso...", "...osssssssso...", "....occcccco....", "...ojjccccjjo...", "..osjjjjjjjjso..", "..osjJjjjjJjso..", "...ojJjjjjJjo...", "....oppppppo....", "....opo..opo....", "....oBo..ooo....", "....ooo........."], "DOWN_B": ["....oooooooo....", "...ohhhhhhhho...", "..ohwhhhhhhhho..", ".oHHHHHHHHHHHHo.", "..oossssssssoo..", "...osesssseso...", "...osssssssso...", "....occcccco....", "...ojjccccjjo...", "..osjjjjjjjjso..", "..osjJjjjjJjso..", "...ojJjjjjJjo...", "....oppppppo....", "....opo..opo....", "....ooo..oBo....", ".........ooo...."], "UP": ["....oooooooo....", "...ohhhhhhhho...", "..ohhhhhhhhhho..", ".oHHHHHHHHHHHHo.", "..ooHHHHHHHHoo..", "...osssssssso...", "....occcccco....", "...obbbbbbbbo...", "..osbbbbbbbbso..", "..osbBbbbbBbso..", "..ojbbbbbbbbjo..", "...ojbbbbbbjo...", "....oppppppo....", "....opo..opo....", "....oBo..oBo....", "....ooo..ooo...."], "UP_A": ["....oooooooo....", "...ohhhhhhhho...", "..ohhhhhhhhhho..", ".oHHHHHHHHHHHHo.", "..ooHHHHHHHHoo..", "...osssssssso...", "....occcccco....", "...obbbbbbbbo...", "..osbbbbbbbbso..", "..osbBbbbbBbso..", "..ojbbbbbbbbjo..", "...ojbbbbbbjo...", "....oppppppo....", "....opo..opo....", "....oBo..ooo....", "....ooo........."], "UP_B": ["....oooooooo....", "...ohhhhhhhho...", "..ohhhhhhhhhho..", ".oHHHHHHHHHHHHo.", "..ooHHHHHHHHoo..", "...osssssssso...", "....occcccco....", "...obbbbbbbbo...", "..osbbbbbbbbso..", "..osbBbbbbBbso..", "..ojbbbbbbbbjo..", "...ojbbbbbbjo...", "....oppppppo....", "....opo..opo....", "....ooo..oBo....", ".........ooo...."], "SIDE": [".....ooooooo....", "....ohhhhhhho...", "...ohhwhhhhhho..", "..oHHHHHHHHHHHHo", "...ooosssssoo...", "....obssseso....", "....obsssssso...", "....obbccccco...", "...obbbjjjjo....", "...obbbjjjjo....", "...obbjJjsjo....", "....oojJjjo.....", ".....oppppo.....", ".....opoopo.....", ".....oBooBo.....", ".....oooooo....."], "SIDE_A": [".....ooooooo....", "....ohhhhhhho...", "...ohhwhhhhhho..", "..oHHHHHHHHHHHHo", "...ooosssssoo...", "....obssseso....", "....obsssssso...", "....obbccccco...", "...obbbjjjjo....", "...obbbjjjjo....", "...obbjJjsjo....", "....oojJjjo.....", ".....oppppo.....", "....opo..opo....", "...oBo....oBo...", "...ooo....ooo..."], "SIDE_B": [".....ooooooo....", "....ohhhhhhho...", "...ohhwhhhhhho..", "..oHHHHHHHHHHHHo", "...ooosssssoo...", "....obssseso....", "....obsssssso...", "....obbccccco...", "...obbbjjjjo....", "...obbbjjjjo....", "...obbjJjsjo....", "....oojJjjo.....", ".....oppppo.....", ".....oppppo.....", ".....oBBBBo.....", ".....oooooo....."]};
+  const S = { name: 'gba', out: '#33402a',
+    grass: ['#b4e888', '#88d060', '#60b048', '#3c8434'], path: ['#f4e4b8', '#e2cc94', '#c4a86c', '#8c7448'], tall: ['#6cc050', '#4a9c3c', '#2f7a2c', '#1d5420'],
+    water: ['#e0f8ff', '#78ccf4', '#4a9ee4', '#2c6cb8'], tree: ['#a4e070', '#6cbc4c', '#428e38', '#24602a'], trunk: ['#b0804c', '#6c4428'],
+    roofA: ['#ffa890', '#ec6448', '#c03c2c', '#7c2018'], roofB: ['#a0c8ff', '#5c8ce8', '#3c64c0', '#24387c'], wall: ['#fffcf0', '#f2e8d4', '#d4c4a4', '#7a6c58'],
+    wood: ['#f4cc90', '#d09858', '#9c6c38', '#5c3c1c'], win: ['#4c80d8', '#c8e8ff'], flower: ['#ff6c84', '#ffe46c', '#ffffff'],
+    chr: { o: '#2a3420', h: '#ecc870', H: '#b08838', w: '#fff4c8', s: '#fcd0a4', e: '#2a3420', c: '#30c4b0', j: '#f88c3c', J: '#c0641c', p: '#40548c', b: '#946238', B: '#583420' } };
+  Object.assign(S, { roofC: ['#c8e890', '#7cbc58', '#4e8c3c', '#2c5424'], roofD: ['#ffd08a', '#f0a040', '#c07020', '#784010'], roofE: ['#e0b8ff', '#a070e0', '#7048b0', '#40286c'], roofF: ['#a8f0e8', '#40c0b0', '#208c80', '#104c48'], roofG: ['#e4e4ec', '#b0b0c0', '#808094', '#4c4c5c'] });
+  const el = (id) => document.getElementById(id);
+  const root = el('town'), cv = el('towncv'), ctx = cv.getContext('2d');
+  const dlg = el('tdlg'), banner = el('tbanner');
+  let ctxRef = ctx;
+  const px = (c, x, y, w = 1, h = 1) => { ctxRef.fillStyle = c; ctxRef.fillRect(x, y, w, h); };
+  const hash = (x, y, k = 0) => { let n = (x * 374761393 + y * 668265263 + k * 2147483647) | 0; n = (n ^ (n >>> 13)) * 1274126177; return ((n ^ (n >>> 16)) >>> 0) / 4294967296; };
+
+  // ---------- town map ----------
+  const BUILDINGS = [
+    { id: 'home', name: 'Your House', x: 4, y: 3, roof: 'roofA', sec: 'sec-mine', wall: '#f6e2c8' },
+    { id: 'market', name: 'Market Hall', x: 11, y: 3, roof: 'roofB', sec: 'sec-index', wall: '#dfe8f6' },
+    { id: 'trading', name: 'Trading Post', x: 18, y: 3, roof: 'roofD', sec: 'sec-movers', wall: '#f6ead2' },
+    { id: 'pulse', name: 'Pulse Observatory', x: 25, y: 3, roof: 'roofE', sec: 'sec-pulse', wall: '#ece2f6' },
+    { id: 'library', name: 'Card Library', x: 4, y: 11, roof: 'roofC', sec: 'sec-find', wall: '#e4f2dc' },
+    { id: 'museum', name: 'Museum', x: 20, y: 11, roof: 'roofF', sec: 'sec-museum', wall: '#dcf2ee' },
+    { id: 'hall', name: 'Town Hall', x: 26, y: 11, roof: 'roofG', sec: 'settings', wall: '#ececf0' },
+  ];
+  const TW = 34, TH = 26;
+  let M, B, objects, flowers, signs, doors;
+  function buildTown() {
+    M = Array.from({ length: TH }, () => Array(TW).fill('g'));
+    B = Array.from({ length: TH }, () => Array(TW).fill(false));
+    objects = []; flowers = []; signs = {}; doors = {};
+    const set = (c, r, v) => { if (r >= 0 && r < TH && c >= 0 && c < TW) M[r][c] = v; };
+    const block = (c, r) => { if (r >= 0 && r < TH && c >= 0 && c < TW) B[r][c] = true; };
+    const tree = (c, r) => { objects.push({ k: 'tree', x: c * T, y: r * T, z: r * T + 30 }); for (let dy = 0; dy < 2; dy++) for (let dx = 0; dx < 2; dx++) block(c + dx, r + dy); };
+    for (let c = 2; c <= 31; c++) { set(c, 8, 'p'); set(c, 9, 'p'); set(c, 16, 'p'); set(c, 17, 'p'); }
+    for (let r = 10; r <= 15; r++) { set(16, r, 'p'); set(17, r, 'p'); }
+    for (let r = 11; r <= 14; r++) for (let c = 10; c <= 14; c++) set(c, r, 'w');
+    for (let r = 19; r <= 21; r++) for (let c = 3; c <= 11; c++) set(c, r, 't');
+    for (const b of BUILDINGS) {
+      objects.push({ k: 'house', x: b.x * T, y: b.y * T, roof: b.roof, z: (b.y + 4) * T });
+      for (let r = b.y - 1; r < b.y + 4; r++) for (let c = b.x; c < b.x + 5; c++) block(c, r);
+      const dc = b.x + 2, dr = b.y + 3; doors[dc + ',' + dr] = b; b.door = [dc, dr];
+      set(dc, dr + 1, 'p');
+      const sc = b.x + 1, sr = b.y + 4; signs[sc + ',' + sr] = b; objects.push({ k: 'sign', x: sc * T, y: sr * T - 4, z: sr * T + 6 }); block(sc, sr);
+      flowers.push([b.x, b.y + 4], [b.x + 3, b.y + 4], [b.x + 4, b.y + 4]);
+    }
+    for (const [a, r] of [[9, 7], [16, 7], [23, 7], [30, 7], [9, 15], [25, 15]]) { objects.push({ k: 'fence', x: a * T, y: r * T, n: 1, z: r * T + 12 }); block(a, r); }
+    for (let c = 0; c < TW; c += 2) { tree(c, 0); tree(c, 24); }
+    for (let r = 2; r < 24; r += 2) { tree(0, r); tree(32, r); }
+    for (const [c, r] of [[20, 19], [24, 20], [28, 19], [13, 19]]) tree(c, r);
+    for (let r = 18; r <= 22; r++) for (let c = 13; c <= 30; c++) if (!B[r][c] && M[r][c] === 'g' && hash(c, r, 3) < .18) flowers.push([c, r]);
+    for (let r = 10; r <= 15; r++) for (let c = 2; c <= 30; c++) if (!B[r][c] && M[r][c] === 'g' && hash(c, r, 4) < .08) flowers.push([c, r]);
+  }
+  const isW = (c, r) => r >= 0 && r < TH && c >= 0 && c < TW && M[r][c] === 'w';
+  const isP = (c, r) => r >= 0 && r < TH && c >= 0 && c < TW && M[r][c] === 'p';
+
+  // ---------- interiors ----------
+  const RW = 11, RH = 9;
+  const room = { pc: [5, 2], mat: [5, 8] };
+  function roomBlocked(c, r) {
+    if (c <= 0 || c >= RW - 1 || r <= 1 || r >= RH) return !(c === room.mat[0] && r === room.mat[1]);
+    if (c === 5 && r === 2) return true; // desk + PC
+    if ((c === 1 || c === 2) && r === 2) return true; // bookshelf
+    if (c === 9 && r === 2) return true; // plant
+    if ((c === 7 || c === 8) && r === 5) return true; // table
+    if (c === 1 && r === 7) return true; // plant
+    return false;
+  }
+  // ---- tiles ----
+  function grassTile(c, r, t) {
+    const g = S.grass; px(g[1], c * T, r * T, T, T);
+    if (gba && hash(c >> 1, r >> 1, 3) < .4) { for (let yy = 0; yy < T; yy++) for (let xx = (yy & 1); xx < T; xx += 2) px('#7cc458', c * T + xx, r * T + yy); }
+    for (let i = 0; i < (gba ? 9 : 4); i++) { const x = Math.floor(hash(c, r, i) * 15), y = Math.floor(hash(r, c, i + 9) * 14);
+      if (gba) { px(g[2], c * T + x, r * T + y + 1); px(g[0], c * T + x, r * T + y); } else { px(g[2], c * T + x, r * T + y, 1, 1); px(g[2], c * T + x + 2, r * T + y, 1, 1); px(g[2], c * T + x + 1, r * T + y + 1); } }
+    if (gba && hash(c, r, 77) < .35) { const x = c * T + 3 + Math.floor(hash(c, r, 5) * 9), y = r * T + 4 + Math.floor(hash(c, r, 6) * 8); px(g[0], x, y, 2, 1); px(g[0], x + 1, y - 1); }
+  }
+  function pathTile(c, r) {
+    const p = S.path; px(p[1], c * T, r * T, T, T);
+    for (let i = 0; i < (gba ? 6 : 3); i++) { const x = Math.floor(hash(c, r, i + 30) * 14), y = Math.floor(hash(c, r, i + 40) * 14); px(p[2], c * T + x, r * T + y, gba ? 2 : 1, 1); if (gba) px(p[0], c * T + x, r * T + y - 1, 2, 1); }
+    // edges against grass
+    const g = S.grass, e = gba ? p[3] : p[2];
+    if (!isP(c, r - 1)) { px(e, c * T, r * T, T, 1); if (gba) px(p[2], c * T, r * T + 1, T, 1); for (let x = 0; x < T; x += 4) px(g[1], c * T + x + (r & 1) * 2, r * T, 2, 1); }
+    if (!isP(c, r + 1)) { px(e, c * T, r * T + T - 1, T, 1); for (let x = 0; x < T; x += 4) px(g[1], c * T + x + 1, r * T + T - 1, 2, 1); }
+    if (!isP(c - 1, r) && c > 0) { px(e, c * T, r * T, 1, T); }
+    if (!isP(c + 1, r) && c < TW - 1) { px(e, c * T + T - 1, r * T, 1, T); }
+  }
+  function tallTile(c, r, t) {
+    const g = S.tall; px(S.grass[1], c * T, r * T, T, T);
+    const sway = Math.floor(t / 20 + c) % 2;
+    for (let yy = 0; yy < 2; yy++) for (let xx = 0; xx < 2; xx++) { const x = c * T + xx * 8, y = r * T + yy * 8;
+      px(g[2], x + 1, y + 3, 6, 5); px(g[1], x + 1, y + 2, 6, 3);
+      px(g[1], x + 1 + sway, y, 1, 3); px(g[1], x + 4, y + sway, 1, 3); px(g[1], x + 6 - sway, y + 1, 1, 2);
+      px(g[3], x + 1, y + 7, 6, 1); if (!dmg) { px(g[0], x + 2, y + 2, 1, 1); px(g[0], x + 5, y + 3, 1, 1); } }
+  }
+  function waterTile(c, r, t) {
+    const w = S.water; px(w[1], c * T, r * T, T, T);
+    const ph = Math.floor(t / 12);
+    for (let i = 0; i < 3; i++) { const y = r * T + 3 + i * 5, x = c * T + ((ph + i * 5 + c * 3) % 12);
+      px(w[0], x, y, 3, 1); if (!dmg) px(w[2], x + 1, y + 1, 3, 1); }
+    if (gba) { if ((ph + c + r) % 5 === 0) px('#ffffff', c * T + 8, r * T + 6);
+      if (hash(c, r, 99) < .3 && isW(c, r - 1)) { const lx = c * T + 4, ly = r * T + 6; px('#3c8c3c', lx, ly, 6, 4); px('#5cb04c', lx + 1, ly, 4, 3); px(w[1], lx + 3, ly, 1, 2); if (hash(c, r, 5) < .5) px('#ffb0c8', lx + 1, ly + 1, 2, 1); } }
+    const sh = S.grass, edge = w[3];
+    if (!isW(c, r - 1)) { px(gba ? S.path[1] : sh[1], c * T, r * T, T, 2); px(edge, c * T, r * T + 2, T, 1); if (!dmg) px(w[2], c * T, r * T + 3, T, 1); }
+    if (!isW(c - 1, r)) { px(gba ? S.path[1] : sh[1], c * T, r * T, 2, T); px(edge, c * T + 2, r * T + (isW(c, r - 1) ? 0 : 2), 1, T); }
+    if (!isW(c + 1, r)) { px(gba ? S.path[1] : sh[1], c * T + T - 2, r * T, 2, T); px(edge, c * T + T - 3, r * T + (isW(c, r - 1) ? 0 : 2), 1, T); }
+  }
+  // ---- objects ----
+  function drawTree(x, y) {
+    const tr = S.tree;
+    if (gba) { ctx.fillStyle = 'rgba(20,40,10,.22)'; ctx.beginPath(); ctx.ellipse(x + 17, y + 29, 13, 4, 0, 0, 7); ctx.fill(); }
+    px(S.trunk[1], x + 13, y + 22, 6, 8); px(S.trunk[0], x + 14, y + 22, 3, 7); px(S.out, x + 12, y + 29, 8, 1);
+    const R = 14, cx = x + 16, cy = y + 13;
+    for (let yy = -R; yy <= R; yy++) for (let xx = -R; xx <= R; xx++) { const d = xx * xx + yy * yy * 1.15; if (d > R * R) continue;
+      let col = tr[1]; const l = (xx + yy) / R;
+      if (d > (R - 1.3) * (R - 1.3)) col = gba ? tr[3] : S.out; else if (l > .55) col = tr[2]; else if (gba && l > .1) col = (xx + yy) & 1 ? tr[1] : tr[2]; else if (l < -.75 || (!dmg && l < -.45 && (xx & 1))) col = tr[0];
+      px(col, cx + xx, cy + yy); }
+    // leaf clumps
+    for (const [ax, ay] of [[-6, -4], [3, -7], [5, 2], [-3, 5]]) { px(tr[2], cx + ax, cy + ay + 2, 4, 1); px(tr[0], cx + ax, cy + ay, 2, 1); }
+    if (gba) { for (const [ax, ay] of [[-8, -7], [-4, -10], [0, -6], [-9, -1], [-5, -3]]) px('#d8f4a0', cx + ax, cy + ay, 1, 1); px(tr[0], cx - 7, cy - 6, 3, 2); }
+  }
+  function drawHouse(o) {
+    const { x, y } = o, R = S[o.roof], wl = S.wall, w = 80;
+    if (gba) { ctx.fillStyle = 'rgba(20,40,10,.22)'; ctx.fillRect(x + 4, y + 60, w, 6); }
+    // walls (front face)
+    px(S.out, x + 2, y + 34, w - 4, 30); px(wl[1], x + 3, y + 35, w - 6, 28);
+    if (!dmg) { px(wl[2], x + 3, y + 59, w - 6, 4); for (let i = 0; i < w - 6; i += 6) px(wl[2], x + 3 + i, y + 35, 1, 24); }
+    else { px(wl[2], x + 3, y + 60, w - 6, 3); }
+    // door
+    px(S.out, x + 33, y + 44, 14, 20); px(S.wood[2], x + 34, y + 45, 12, 19); px(S.wood[1], x + 35, y + 46, 10, 7); px(S.wood[1], x + 35, y + 55, 10, 8); px(S.wood[0], x + 43, y + 55, 1, 2);
+    px(S.path[2], x + 31, y + 63, 18, 1);
+    if (gba) { px('#b8b0a0', x + 32, y + 63, 16, 3); px('#d8d0c0', x + 33, y + 63, 14, 1);
+      for (const wx of [x + 10, x + 56]) { px('#9c6c38', wx - 1, y + 54, 16, 3); for (let i = 0; i < 5; i++) { px('#4a9c3c', wx + 1 + i * 3, y + 52, 2, 2); px(i % 2 ? '#ff6c84' : '#ffe46c', wx + 1 + i * 3, y + 51, 1, 1); } } }
+    // windows
+    for (const wx of [x + 10, x + 56]) { px(S.out, wx, y + 42, 14, 12); px(S.win[0], wx + 1, y + 43, 12, 10); px(S.win[1], wx + 2, y + 44, 4, 3); if (gba) px('#ffffff', wx + 2, y + 44, 2, 1); px(S.out, wx + 7, y + 43, 1, 10); px(S.out, wx + 1, y + 48, 12, 1); px(S.wood[1], wx - 1, y + 54, 16, 2); }
+    // roof (seen from above at an angle): back slope lighter, front slope darker, ridge between
+    px(S.out, x, y, w, 36);
+    for (let r = 1; r < 35; r++) { const back = r < 14; let col = back ? R[0] : R[1]; if (r === 14) col = R[3]; if (!back && r > 28) col = R[2];
+      px(col, x + 1, y + r, w - 2, 1);
+      if (!dmg && (r % 4 === 0)) for (let i = (r % 8 ? 0 : 5); i < w - 2; i += 10) px(back ? R[1] : R[2], x + 1 + i, y + r, 1, 4);
+      if (gba && r % 4 === 1) px(back ? '#ffffff22' : R[2], x + 1, y + r, w - 2, 1); }
+    px(R[3], x + 1, y + 34, w - 2, 1);
+    if (gba) { px(R[0], x + 1, y + 13, w - 2, 1); px('#ffffff55', x + 1, y + 1, w - 2, 1); }
+    // chimney
+    px(S.out, x + 60, y - 6, 10, 14); px(S.wall[2], x + 61, y - 5, 8, 12); px(S.wall[3], x + 61, y - 5, 8, 2);
+  }
+  function drawFence(o) {
+    const wd = S.wood, len = o.n * T;
+    px(S.out, o.x, o.y + 4, len, 4); px(wd[1], o.x, o.y + 5, len, 2);
+    for (let i = 0; i < o.n * 2 + 1; i++) { const fx = o.x + i * 8; if (fx > o.x + len - 2) break; px(S.out, fx, o.y, 4, 12); px(wd[0], fx + 1, o.y + 1, 2, 9); if (!dmg) px(wd[2], fx + 1, o.y + 9, 2, 2); }
+    if (gba) { ctx.fillStyle = 'rgba(20,40,10,.18)'; ctx.fillRect(o.x, o.y + 12, len, 2); }
+  }
+  function drawSign(o) {
+    const wd = S.wood;
+    px(S.out, o.x + 6, o.y + 8, 4, 8); px(wd[2], o.x + 7, o.y + 8, 2, 8);
+    px(S.out, o.x, o.y, 16, 10); px(wd[1], o.x + 1, o.y + 1, 14, 8); px(wd[0], o.x + 1, o.y + 1, 14, 2);
+    px(wd[3], o.x + 3, o.y + 4, 10, 1); px(wd[3], o.x + 3, o.y + 6, 7, 1);
+  }
+  function drawFlower(c, r, t, k) {
+    const f = S.flower, sw = Math.floor(t / 24 + k) % 2;
+    for (const [dx, dy, col] of [[3, 4, f[k % 2]], [10, 3, f[(k + 1) % 2]], [6, 10, f[2]]]) { const x = c * T + dx + (dy > 5 ? 0 : sw), y = r * T + dy;
+      px(S.grass[2], x + 1, y + 2, 1, 2); px(col, x, y, 3, 1); px(col, x + 1, y - 1, 1, 3); px(dmg ? S.out : '#f8d030', x + 1, y, 1, 1); }
+  }
+  function drawWalker(t) {
+    const anim = Math.floor(dist / 8) % 2, moving = wait === 0;
+    const key = dir + (moving ? (anim ? '_A' : '_B') : '');
+    const spr = SPR[key] || SPR[dir];
+    const x = Math.round(wx), y = Math.round(wy) - (moving && anim ? 1 : 0);
+    if (!dmg) { ctx.fillStyle = gba ? 'rgba(20,40,10,.25)' : S.grass[3]; ctx.beginPath(); ctx.ellipse(x + 8, Math.round(wy) + 15, 5, 2, 0, 0, 7); ctx.fill(); }
+    for (let r = 0; r < 16; r++) for (let c = 0; c < 16; c++) { const ch = spr[r][flip ? 15 - c : c]; const col = S.chr[ch]; if (col) px(col, x + c, y + r); }
+  }
+
+  // ---------- interior art ----------
+  function drawRoom(b, t) {
+    const wl = b.wall, out = S.out;
+    for (let r = 0; r < RH; r++) for (let c = 0; c < RW; c++) { const x = c * T, y = r * T;
+      if (r < 2) { px(wl, x, y, T, T); px('rgba(0,0,0,.06)', x, y + 13, T, 3); if (r === 1) { px('#b08a5a', x, y + 12, T, 4); px('#8a6438', x, y + 15, T, 1); } }
+      else { px((c + r) % 2 ? '#d9b07a' : '#d2a870', x, y, T, T); px('#c09060', x, y + 7, T, 1); px('#c09060', x + ((r % 2) ? 5 : 11), y, 1, 7); px('#c09060', x + ((r % 2) ? 11 : 3), y + 8, 1, 8); } }
+    px(out, 0, 0, T, RH * T); px(out, (RW - 1) * T, 0, T, RH * T); px('#5c4a3a', 2, 32, 12, RH * T - 32); px('#5c4a3a', (RW - 1) * T + 2, 32, 12, RH * T - 32);
+    // window on the back wall
+    px(out, 7 * T, 4, 28, 18); px('#a8d8ff', 7 * T + 2, 6, 24, 14); px('#e8f6ff', 7 * T + 4, 8, 6, 3); px(out, 7 * T + 13, 6, 2, 14); px(out, 7 * T + 2, 12, 24, 2);
+    // name plaque
+    px(out, 2 * T + 4, 6, 40, 12); px('#f4e4b8', 2 * T + 5, 7, 38, 10); for (let i = 0; i < 5; i++) px('#8c7448', 2 * T + 9 + i * 7, 11, 4, 2);
+    // bookshelf
+    px(out, T, 2 * T - 10, 2 * T, 26); px('#8a5a30', T + 1, 2 * T - 9, 2 * T - 2, 24);
+    for (let s = 0; s < 3; s++) { px('#5c3c1c', T + 1, 2 * T - 9 + s * 8 + 7, 2 * T - 2, 1); for (let i = 0; i < 7; i++) px(['#e05050', '#4c80d8', '#f0c040', '#50a050'][(i + s) % 4], T + 3 + i * 4, 2 * T - 8 + s * 8, 3, 6); }
+    // desk and PC
+    const dx = 5 * T - 6, dy = 2 * T - 6;
+    px(out, dx, dy + 10, 28, 14); px('#b88048', dx + 1, dy + 11, 26, 12); px('#8a5a30', dx + 1, dy + 20, 26, 3);
+    px(out, dx + 6, dy - 6, 16, 14); px('#d8d8e0', dx + 7, dy - 5, 14, 12);
+    const glow = (t >> 4) % 2 ? '#7cf0b0' : '#5cd890'; px('#203048', dx + 8, dy - 4, 12, 8); px(glow, dx + 9, dy - 3, 4, 1); px(glow, dx + 9, dy - 1, 8, 1); px(glow, dx + 9, dy + 1, 6, 1);
+    px(out, dx + 12, dy + 7, 4, 3); px('#e8e8ee', dx + 8, dy + 14, 12, 3); px('#a0a0a8', dx + 8, dy + 16, 12, 1);
+    // plants
+    for (const [c, r] of [[9, 2], [1, 7]]) { const x = c * T, y = r * T; px('#c0603c', x + 4, y + 9, 8, 6); px('#8c3c24', x + 4, y + 14, 8, 1); px('#3c8c3c', x + 2, y + 1, 12, 9); px('#5cb04c', x + 4, y, 8, 6); px('#8ed46c', x + 6, y + 1, 3, 2); }
+    // table and rug
+    const rug = S[b.roof] || S.roofA; px(rug[2], 3 * T, 5 * T + 2, 3 * T, 2 * T - 4); px('#f0e0a0', 3 * T + 2, 5 * T + 4, 3 * T - 4, 2 * T - 8); px(rug[1], 3 * T + 4, 5 * T + 6, 3 * T - 8, 2 * T - 12);
+    px(out, 7 * T, 5 * T - 2, 2 * T, 14); px('#b88048', 7 * T + 1, 5 * T - 1, 2 * T - 2, 9); px('#8a5a30', 7 * T + 1, 5 * T + 8, 2 * T - 2, 3);
+    // door mat
+    px('#7a4c8a', 5 * T + 1, 8 * T + 2, T - 2, T - 4); px('#a070b0', 5 * T + 3, 8 * T + 4, T - 6, T - 8);
+  }
+
+  // ---------- player ----------
+  const P = { c: 16, r: 9, dir: 'DOWN', flip: false, mv: 0, dc: 0, dr: 0, step: 0 };
+  let where = 'town', inB = null; // building when inside
+  let wx = 0, wy = 0, wait = 1, dist = 0, dir = 'DOWN', flip = false; // used by drawWalker
+  let fade = 0, fadeTo = null, t = 0, running = false, Z = 3, vw = 0, vh = 0;
+  const held = new Set();
+  function blocked(c, r) {
+    if (where === 'room') return roomBlocked(c, r);
+    if (c < 0 || r < 0 || c >= TW || r >= TH) return true;
+    return B[r][c] || M[r][c] === 'w';
+  }
+  const DIRS = { UP: [0, -1], DOWN: [0, 1], LEFT: [-1, 0], RIGHT: [1, 0] };
+  function tryMove(d) {
+    const [dx, dy] = DIRS[d]; P.dir = d === 'LEFT' || d === 'RIGHT' ? 'SIDE' : d; P.flip = d === 'LEFT';
+    const nc = P.c + dx, nr = P.r + dy;
+    if (where === 'town' && d === 'UP' && doors[nc + ',' + nr]) { enter(doors[nc + ',' + nr]); return; }
+    if (where === 'room' && d === 'DOWN' && nc === room.mat[0] && nr === room.mat[1] + 1) { exit(); return; }
+    if (blocked(nc, nr)) return;
+    P.dc = dx; P.dr = dy; P.mv = T; hideDialog(true);
+  }
+  function enter(b) { fadeTo = () => { where = 'room'; inB = b; P.c = room.mat[0]; P.r = room.mat[1]; P.dir = 'UP'; P.flip = false; showBanner(b.name); }; fade = 1; }
+  function exit() { const b = inB; fadeTo = () => { where = 'town'; inB = null; P.c = b.door[0]; P.r = b.door[1] + 1; P.dir = 'DOWN'; showBanner('Index Town'); }; fade = 1; }
+  function facing() { const [dx, dy] = DIRS[P.dir === 'SIDE' ? (P.flip ? 'LEFT' : 'RIGHT') : P.dir]; return [P.c + dx, P.r + dy]; }
+  function act() {
+    if (dlgOpen && !dlgAuto) { hideDialog(); return; }
+    const [fc, fr] = facing();
+    if (where === 'room' && fc === room.pc[0] && fr === room.pc[1]) { hideDialog(true); openPC(inB); return; }
+    if (where === 'town' && signs[fc + ',' + fr]) { showSign(signs[fc + ',' + fr], false); return; }
+  }
+  // ---------- dialogs ----------
+  let dlgOpen = false, dlgAuto = false, bannerT = 0;
+  function showDialog(html, auto) { dlg.innerHTML = html + (auto ? '' : '<span class="tmore" aria-hidden="true">▼</span>'); dlg.hidden = false; dlgOpen = true; dlgAuto = auto; }
+  function hideDialog(onlyAuto) { if (onlyAuto && !dlgAuto) return; dlg.hidden = true; dlgOpen = false; }
+  function showBanner(txt) { banner.textContent = txt; banner.hidden = false; bannerT = 150; }
+  function signText(b) {
+    const D = window.__townData?.() || {}; const L = D.latest, f = window.__townFmt || {};
+    const extra = {
+      home: () => { const w = L?.watchlist?.cards || []; if (!w.length) return 'No cards tracked yet.'; let n = 0, v = 0; const rec = Object.fromEntries((L.records || []).map((r) => [r.id, r])); for (const e of w) { n += e.qty || 1; v += (rec[e.id]?.gbp || 0) * (e.qty || 1); } return `${n} cards inside, worth ${f.money ? f.money(v) : '£' + v.toFixed(0)}.`; },
+      market: () => { const a = D.history?.idx?.all; const m = L?.momentum?.all?.vs30; return a ? `Index today: ${a[a.length - 1].toLocaleString('en-GB', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}. 7-day vs 30-day: ${m > 0 ? '+' : ''}${m?.toFixed(1)}%.` : ''; },
+      trading: () => { const u = L?.movers?.up?.[0], d = L?.movers?.down?.[0]; return u ? `Top riser: ${u.name} ${u.chg > 0 ? '+' : ''}${u.chg.toFixed(0)}%. Top faller: ${d?.name} ${d?.chg.toFixed(0)}%.` : ''; },
+      pulse: () => L ? `${L.counts.market.toLocaleString('en-GB')} cards at £3+ under watch.` : '',
+      library: () => 'Look up any card and its live price.',
+      museum: () => 'The 53 blue-chip cards, and how the index is worked out.',
+      hall: () => 'Settings. Switch back to the classic view here.',
+    }[b.id];
+    return `<b>${b.name.toUpperCase()}</b><br>${extra ? extra() : ''}`;
+  }
+  function showSign(b, auto) { showDialog(signText(b), auto); }
+  // ---------- PC window ----------
+  let pcOpen = false, moved = null;
+  const win = el('pcwin'), winBody = el('pcbody'), winTitle = el('pctitle');
+  function openPC(b) {
+    winTitle.textContent = b.name + ' PC';
+    if (b.sec === 'settings') { winBody.innerHTML = settingsHTML(); bindSettings(); }
+    else { const node = el(b.sec); if (node) { moved = { node, ph: document.createComment('slot'), }; node.parentNode.insertBefore(moved.ph, node); winBody.appendChild(node); } }
+    win.hidden = false; pcOpen = true; held.clear(); el('pcclose').focus();
+    window.dispatchEvent(new Event('resize'));
+  }
+  function closePC() {
+    if (!pcOpen) return;
+    if (moved) { moved.ph.parentNode.insertBefore(moved.node, moved.ph); moved.ph.remove(); moved = null; }
+    winBody.innerHTML = ''; win.hidden = true; pcOpen = false; cv.focus();
+  }
+  function settingsHTML() {
+    return `<div class="band"><div class="wrap" style="max-width:640px"><h2>Settings</h2><p class="sub">Index Town is the default. The classic view shows everything on one scrolling page.</p>
+      <div class="setrow2"><div><b>Town mode</b><br><span class="notes">Walk around the town to open each part of the tracker.</span></div><button type="button" class="btn pri" id="toClassic">Switch to classic view</button></div>
+      <div class="setrow2"><div><b>Start position</b><br><span class="notes">Send the explorer back to the town square.</span></div><button type="button" class="btn" id="toStart">Return to start</button></div>
+      <h3 style="margin-top:22px">Controls</h3><p class="notes">Arrow keys or WASD to walk. Enter, Space or Z to read signs and use PCs. Esc or X to close. On a phone, use the pad and the A and B buttons.</p></div></div>`;
+  }
+  function bindSettings() {
+    el('toClassic').onclick = () => { closePC(); window.__setView('classic'); };
+    el('toStart').onclick = () => { closePC(); where = 'town'; inB = null; P.c = 16; P.r = 9; P.dir = 'DOWN'; P.mv = 0; showBanner('Index Town'); };
+  }
+  el('pcclose').onclick = closePC;
+  // ---------- loop ----------
+  function size() {
+    const W = innerWidth, H = innerHeight;
+    Z = Math.max(2, Math.min(4, Math.round(Math.min(W / (T * 20), H / (T * 12)))));
+    vw = Math.ceil(W / Z); vh = Math.ceil(H / Z);
+    cv.width = vw; cv.height = vh; cv.style.width = vw * Z + 'px'; cv.style.height = vh * Z + 'px';
+  }
+  function update() {
+    t++;
+    if (bannerT > 0 && --bannerT === 0) banner.hidden = true;
+    if (fade > 0) { fade += 1; if (fade === 12 && fadeTo) { fadeTo(); fadeTo = null; } if (fade >= 24) fade = 0; return; }
+    if (P.mv > 0) { P.mv -= 1; P.step++; if (P.mv === 0) { P.c += P.dc; P.r += P.dr; P.dc = P.dr = 0; } }
+    if (P.mv === 0 && !pcOpen && !(dlgOpen && !dlgAuto)) {
+      const order = ['UP', 'DOWN', 'LEFT', 'RIGHT']; const d = [...held].filter((k) => order.includes(k)).pop();
+      if (d) tryMove(d);
+      if (P.mv === 0) { // standing still: read nearby signs, prompt at the PC
+        let near = null; if (where === 'town') for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const s = signs[(P.c + dx) + ',' + (P.r + dy)]; if (s) near = s; }
+        if (near && (!dlgOpen || dlgAuto)) showSign(near, true);
+        else if (where === 'room') { const [fc, fr] = facing(); if (fc === room.pc[0] && fr === room.pc[1] && (!dlgOpen || dlgAuto)) showDialog(`<b>${inB.name.toUpperCase()} PC</b><br>Press A (Enter) to switch it on.`, true); else if (dlgAuto) hideDialog(true); }
+        else if (dlgAuto) hideDialog(true);
+      }
+    }
+  }
+  function draw() {
+    const prog = P.mv ? (T - P.mv) : 0;
+    const pxw = P.c * T + P.dc * prog, pyw = P.r * T + P.dr * prog;
+    wx = pxw; wy = pyw - 4; wait = P.mv ? 0 : 1; dist = P.step; dir = P.dir; flip = P.flip;
+    const mapW = (where === 'town' ? TW : RW) * T, mapH = (where === 'town' ? TH : RH) * T;
+    let camX = Math.round(pxw + 8 - vw / 2), camY = Math.round(pyw + 8 - vh / 2);
+    camX = mapW <= vw ? Math.round((mapW - vw) / 2) : Math.max(0, Math.min(mapW - vw, camX));
+    camY = mapH <= vh ? Math.round((mapH - vh) / 2) : Math.max(0, Math.min(mapH - vh, camY));
+    ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.fillStyle = where === 'town' ? '#24602a' : '#1a1410'; ctx.fillRect(0, 0, vw, vh);
+    ctx.setTransform(1, 0, 0, 1, -camX, -camY);
+    if (where === 'town') {
+      const c0 = Math.max(0, Math.floor(camX / T)), c1 = Math.min(TW - 1, Math.ceil((camX + vw) / T)), r0 = Math.max(0, Math.floor(camY / T)), r1 = Math.min(TH - 1, Math.ceil((camY + vh) / T));
+      for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) { const m = M[r][c]; if (m === 'p') pathTile(c, r); else if (m === 'w') waterTile(c, r, t); else if (m === 't') tallTile(c, r, t); else grassTile(c, r, t); }
+      flowers.forEach(([c, r], k) => { if (c >= c0 - 1 && c <= c1 && r >= r0 - 1 && r <= r1) drawFlower(c, r, t, k); });
+      const list = objects.filter((o) => o.x > camX - 96 && o.x < camX + vw + 16 && o.y > camY - 80 && o.y < camY + vh + 16).concat([{ k: 'walker', z: wy + 16 }]).sort((a, b) => a.z - b.z);
+      for (const o of list) { if (o.k === 'tree') drawTree(o.x, o.y); else if (o.k === 'house') drawHouse(o); else if (o.k === 'fence') drawFence(o); else if (o.k === 'sign') drawSign(o); else drawWalker(t); }
+    } else { drawRoom(inB, t); drawWalker(t); }
+    if (fade) { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.fillStyle = `rgba(10,12,8,${fade < 12 ? fade / 11 : (24 - fade) / 12})`; ctx.fillRect(0, 0, vw, vh); }
+  }
+  let last = 0, acc = 0;
+  function loop(ts) { if (!running) return; const dt = Math.min(100, ts - (last || ts)); last = ts; acc += dt; while (acc >= 16.6) { if (!pcOpen) update(); acc -= 16.6; } draw(); requestAnimationFrame(loop); }
+  // ---------- input ----------
+  const KEY = { ArrowUp: 'UP', w: 'UP', W: 'UP', ArrowDown: 'DOWN', s: 'DOWN', S: 'DOWN', ArrowLeft: 'LEFT', a: 'LEFT', A: 'LEFT', ArrowRight: 'RIGHT', d: 'RIGHT', D: 'RIGHT' };
+  document.addEventListener('keydown', (e) => {
+    if (!running) return;
+    if (document.getElementById('dr')?.classList.contains('open')) return;
+    if (pcOpen) { if (e.key === 'Escape' && !e.target.closest('input')) { e.preventDefault(); closePC(); } return; }
+    if (e.target.closest('input,select,textarea')) return;
+    if (KEY[e.key]) { e.preventDefault(); held.delete(KEY[e.key]); held.add(KEY[e.key]); }
+    else if (['Enter', ' ', 'z', 'Z'].includes(e.key)) { e.preventDefault(); if (!e.repeat) act(); }
+    else if (['Escape', 'x', 'X', 'Backspace'].includes(e.key)) { hideDialog(); }
+  }, true);
+  addEventListener('keyup', (e) => { if (KEY[e.key]) held.delete(KEY[e.key]); });
+  addEventListener('blur', () => held.clear());
+  for (const b of document.querySelectorAll('#tpad [data-d]')) {
+    const d = b.dataset.d;
+    b.addEventListener('pointerdown', (e) => { e.preventDefault(); b.setPointerCapture?.(e.pointerId); held.add(d); });
+    for (const ev of ['pointerup', 'pointercancel', 'lostpointercapture']) b.addEventListener(ev, () => held.delete(d));
+  }
+  el('tbtnA').addEventListener('pointerdown', (e) => { e.preventDefault(); act(); });
+  el('tbtnB').addEventListener('pointerdown', (e) => { e.preventDefault(); if (pcOpen) closePC(); else hideDialog(); });
+  addEventListener('resize', () => { if (running) size(); });
+  // ---------- public ----------
+  buildTown();
+  return {
+    start() { if (running) return; running = true; root.hidden = false; size(); last = 0; requestAnimationFrame(loop); cv.focus();
+      let seen = false; try { seen = sessionStorage.getItem('townIntro') === '1'; sessionStorage.setItem('townIntro', '1'); } catch {}
+      if (!seen) showDialog('<b>WELCOME TO INDEX TOWN</b><br>Each building holds part of the tracker. Walk up to a sign to read it, go inside and use the PC. Arrow keys or WASD to walk, Enter to use.', false);
+      else showBanner('Index Town'); },
+    stop() { running = false; closePC(); root.hidden = true; held.clear(); },
+    closePC, isPC: () => pcOpen,
+    _debug: () => ({ where, c: P.c, r: P.r, dir: P.dir, pc: pcOpen, dlg: dlgOpen ? dlg.textContent : null, inB: inB?.id }),
+    _press: (k) => { if (KEY[k]) { held.add(KEY[k]); } else act(); },
+    _release: (k) => held.delete(KEY[k]),
+  };
+})();
+
+document.getElementById('toClassicHud').onclick = () => window.__setView('classic');
+{ let v = 'town'; try { v = localStorage.getItem('view') || 'town'; } catch {} window.__setView(v); }
 </script>
 </body>
 </html>
