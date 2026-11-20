@@ -51,7 +51,7 @@ console.log('index', H.idx, 'breadth', H.breadth);
 console.log('ALL TESTS PASS');
 {
   const H2 = JSON.parse(store.mem['public/data/history.json']);
-  assert.equal(H2.est.anchor, '2026-11-20'); assert.equal(H2.est.points.all.length, 3);
+  assert.equal(H2.est.anchor, '2026-11-20'); assert.equal(H2.est.points.all.length, 2);
   assert.ok(H2.est.points.all.every(([o, v]) => o < 0 && v > 0));
   console.log('est', JSON.stringify(H2.est.points.all));
 }

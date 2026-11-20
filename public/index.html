@@ -220,7 +220,7 @@ details summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;alig
       <h2 style="margin-top:28px">How the index works</h2>
       <p>Every night the tracker prices every English Pokémon card on TCGdex (about 20,000, TCG Pocket excluded) using Cardmarket, Europe's main card marketplace. Each card's price is the median of its Cardmarket trend price, 7-day average and 30-day average, converted to pounds at the day's ECB euro reference rate. The median stops one jumpy figure moving a card, which matters for vintage cards where listings mix conditions.</p>
       <p>The market index covers every card worth £3 or more on the previous night, so bulk commons don't swamp it. It is chain-linked and equal-weighted: each day it moves by the geometric mean of every card's price change since the night before, with each card's move capped at roughly +49% or −33%. It started at 1,000. Vintage is sets from 1999 to 2009, Modern 2010 to 2022, and Current era 2023 on (Scarlet &amp; Violet, Mega Evolution). Blue chip is a fixed basket of 53 sought-after cards.</p>
-      <p>Before the nightly history builds up, the dashed start of each line is an estimate: Cardmarket's 30-day, 7-day and yesterday averages for the same cards, placed at the middle of each window. The tiles show momentum: each group's 7-day average sale price against its 30-day average. Prices are for raw, ungraded cards and include the currency effect, so a weaker pound pushes the index up. For a UK sold-price check on any card, use its eBay UK link.</p>
+      <p>Before the nightly history builds up, the dashed start of each line is an estimate: Cardmarket's 30-day and 7-day averages for the same cards, placed at the middle of each window. The tiles show momentum: each group's 7-day average sale price against its 30-day average. Prices are for raw, ungraded cards and include the currency effect, so a weaker pound pushes the index up. For a UK sold-price check on any card, use its eBay UK link.</p>
       <p class="notes" id="notes"></p>
     </div>
   </div>
@@ -336,7 +336,7 @@ function cardSeries(r) {
   const anchor = D.latest?.date || new Date().toISOString().slice(0, 10);
   const hist = D.history?.cards?.[r.id]; const real = hist ? D.history.dates.map((d, i) => [d, hist[i], false]).filter((p) => p[1] != null) : [];
   const first = real.length ? tms(real[0][0]) : Infinity;
-  const est = [[-15, r.avg30], [-3.5, r.avg7], [-1, r.avg1]].filter(([off, v]) => v != null && addDays(anchor, off) < first).map(([off, v]) => [addDays(anchor, off), v, true]);
+  const est = [[-15, r.avg30], [-3.5, r.avg7]].filter(([off, v]) => v != null && addDays(anchor, off) < first).map(([off, v]) => [addDays(anchor, off), v, true]);
   if (!real.length && r.gbp != null) real.push([anchor, r.gbp, false]);
   return est.concat(real);
 }
@@ -373,7 +373,7 @@ function renderBoard() {
       chart(box, series, { label: 'Index groups compared', fmt: (v) => pct(v, 1), zero: 0, estLabel: (i, ref) => estLabel(i, ref, anchorEst) });
     } else chart(box, [{ name, color: '#ffcc00', pts: segSeries(seg).filter((p) => tms(p[0]) >= cut) }], { label: name + ' index', estLabel: (i, ref) => estLabel(i, ref, anchorEst) });
     const hasEst = segSeries(seg).some((p) => p[2]);
-    $('#chartnote').textContent = hasEst ? `Dashed: estimated from Cardmarket's 30-day, 7-day and yesterday averages. Solid: the nightly index, from ${dfmt(dates[0])}.` : '';
+    $('#chartnote').textContent = hasEst ? `Dashed: estimated from Cardmarket's 30-day and 7-day averages, placed mid-window. Solid: the nightly index, from ${dfmt(dates[0])}.` : '';
   } else {
     if (box._ro) box._ro.disconnect();
     box.className = 'early'; $('#chartnote').textContent = '';
@@ -455,7 +455,7 @@ function renderWatch() {
   $('#totals').innerHTML = w.length ? `<span>Cards<b>${N0.format(n)}</b></span><span>Value<b>${money(val)}</b></span>${hasCost ? `<span>Paid<b>${money(cost)}</b></span><span>Gain<b class="${cls(val - cost)}">${money(val - cost)}</b></span>` : ''}` : '';
   const pts = (h?.dates || []).map((d, i) => { let t = 0, any = false; for (const e of w) { const v = h.cards[e.id]?.[i]; if (v != null) { t += v * (e.qty || 1); any = true; } } return [d, any ? Math.round(t * 100) / 100 : null]; }).filter((p) => p[1] != null);
   if (pts.length && D.latest) { // back-estimate from each card's Cardmarket averages
-    const est = [[-15, 'avg30'], [-3.5, 'avg7'], [-1, 'avg1']].map(([off, k]) => { let t = 0, ok = true; for (const e of w) { const r = recs[e.id]; if (!r?.[k]) { ok = false; break; } t += r[k] * (e.qty || 1); } return ok ? [addDays(D.latest.date, off), Math.round(t * 100) / 100, true] : null; }).filter((p) => p && p[0] < tms(pts[0][0]));
+    const est = [[-15, 'avg30'], [-3.5, 'avg7']].map(([off, k]) => { let t = 0, ok = true; for (const e of w) { const r = recs[e.id]; if (!r?.[k]) { ok = false; break; } t += r[k] * (e.qty || 1); } return ok ? [addDays(D.latest.date, off), Math.round(t * 100) / 100, true] : null; }).filter((p) => p && p[0] < tms(pts[0][0]));
     pts.unshift(...est);
   }
   if (w.length && pts.length >= 2) { $('#pfchart').className = 'fig s light'; chart($('#pfchart'), [{ name: 'My cards', color: '#c8270f', pts }], { fmt: (v) => money(v), ink: 'currentColor', faint: 'rgba(128,128,128,.22)', dotRing: 'transparent', label: 'Value of my cards over time', estLabel: (i, ref) => estLabel(i, ref, D.latest.date) }); }
@@ -492,7 +492,7 @@ function openCard(id) {
   $('#panel').innerHTML = `<div class="dhead"><button type="button" class="btn" id="close">Close</button></div>
     <div class="ph2"><span class="holo">${r.img ? `<img src="${esc(r.img.replace('/low.webp', '/high.webp'))}" alt="${esc(r.name)}">` : ''}</span><div><h2>${esc(r.name)}</h2><p class="sub">${esc(r.set || '')}${r.number ? ' · ' + esc(r.number) : ''}${r.rarity ? ' · ' + esc(r.rarity) : ''}</p><div class="big num" style="font-size:52px">${money(r.gbp)}</div><p class="notes">${r.source === 'tcgplayer' ? 'Cardmarket has no price for this card, so this is the TCGplayer (US) market price in pounds.' : r.source === 'tcgplayer-1st' ? 'TCGplayer (US) 1st Edition market price, in pounds.' : `Median of Cardmarket's trend, 7-day and 30-day prices${r.eur ? ` (€${Number(r.eur).toFixed(2)})` : ''}.`}</p></div></div>
     <h3 style="margin-top:18px">Price ladder</h3><div class="ladder">${lad.map(([k, v]) => `<div class="hbar"><span>${k}</span><span class="tr"><i style="width:${Math.max(4, (v - mn) / (mx - mn) * 100)}%;background:${k === 'Our price' ? 'var(--red)' : k.startsWith('US') ? 'var(--c-vintage)' : 'var(--c-blue)'}"></i></span><span class="v">${money(v)}</span></div>`).join('')}</div>
-    ${pts.length >= 2 ? `<h3 style="margin-top:16px">Price over time</h3><div class="fig s light" id="cfig"></div><p class="cardnote">${pts.some((p) => p[2]) ? `Dashed: Cardmarket's 30-day, 7-day and yesterday averages. Solid: ${nReal > 1 ? 'nightly prices' : 'today'}.` : 'Nightly prices.'}${!D.history?.cards?.[id] ? ' Add it to your cards to build a nightly line.' : ''}</p>` : ''}
+    ${pts.length >= 2 ? `<h3 style="margin-top:16px">Price over time</h3><div class="fig s light" id="cfig"></div><p class="cardnote">${pts.some((p) => p[2]) ? `Dashed: Cardmarket's 30-day and 7-day averages. Solid: ${nReal > 1 ? 'nightly prices' : 'today'}.` : 'Nightly prices.'}${!D.history?.cards?.[id] ? ' Add it to your cards to build a nightly line.' : ''}</p>` : ''}
     <div class="links"><a href="https://www.ebay.co.uk/sch/i.html?_nkw=${q}&LH_Sold=1&LH_Complete=1" target="_blank" rel="noopener">eBay UK sold</a><a href="https://www.cardmarket.com/en/Pokemon/Products/Search?searchString=${encodeURIComponent(r.name)}" target="_blank" rel="noopener">Cardmarket</a></div>
     <h3>${w ? 'In my cards' : 'Add to my cards'}</h3>
     ${w ? `<p class="notes">${w.qty || 1} owned${w.cost != null ? ', paid ' + money(w.cost) + ' each' : ''}.</p>` : ''}
